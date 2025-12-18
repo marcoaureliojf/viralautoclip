@@ -7,7 +7,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - redis_data:/data:rw
     command: redis-server --appendonly yes
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -23,12 +23,12 @@ services:
     container_name: autoclip-app
     restart: unless-stopped
     ports:
-      - "8000:8000"  # 后端API
-      - "3000:3000"  # 前端界面
+      - "8008:8000"  # 后端API & 前端 (Unified)
+      - "3008:8000"  # 前端界面 (通过8000端口服务)
     volumes:
-      - ./data:/app/data
-      - ./logs:/app/logs
-      - ./uploads:/app/uploads
+      - ./data:/app/data:rw
+      - ./logs:/app/logs:rw
+      - ./uploads:/app/uploads:rw
     environment:
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=sqlite:///./data/autoclip.db
@@ -53,9 +53,9 @@ services:
     container_name: autoclip-celery-worker
     restart: unless-stopped
     volumes:
-      - ./data:/app/data
-      - ./logs:/app/logs
-      - ./uploads:/app/uploads
+      - ./data:/app/data:rw
+      - ./logs:/app/logs:rw
+      - ./uploads:/app/uploads:rw
     environment:
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=sqlite:///./data/autoclip.db
@@ -68,6 +68,8 @@ services:
         condition: service_healthy
       autoclip:
         condition: service_healthy
+    healthcheck:
+      disable: true
 
   # Celery Beat调度器
   celery-beat:
@@ -77,8 +79,8 @@ services:
     container_name: autoclip-celery-beat
     restart: unless-stopped
     volumes:
-      - ./data:/app/data
-      - ./logs:/app/logs
+      - ./data:/app/data:rw
+      - ./logs:/app/logs:rw
     environment:
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=sqlite:///./data/autoclip.db
@@ -91,6 +93,8 @@ services:
         condition: service_healthy
       autoclip:
         condition: service_healthy
+    healthcheck:
+      disable: true
 
   # Flower监控服务（可选）
   flower:
@@ -111,6 +115,12 @@ services:
         condition: service_healthy
       celery-worker:
         condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5555/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   redis_data:

@@ -101,6 +101,7 @@ class BilibiliDownloader:
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
+            'cachedir': str(self.download_dir / "yt-dlp-cache"),
         }
         
         if self.browser:
@@ -159,6 +160,8 @@ class BilibiliDownloader:
             'quiet': True,
             'progress': True,
             'no_warnings': False,  # 显示警告信息以便调试
+            'cachedir': str(self.download_dir / "yt-dlp-cache"),
+            'ignoreerrors': True,
         }
         
         if self.browser:
@@ -251,6 +254,8 @@ class BilibiliDownloader:
                     'outtmpl': str(self.download_dir / f'{safe_title}_sub.%(ext)s'),
                     'noplaylist': True,
                     'quiet': True,
+                    'cachedir': str(self.download_dir / "yt-dlp-cache"),
+                    'ignoreerrors': True,
                 }
                 
                 if self.browser:
@@ -284,6 +289,8 @@ class BilibiliDownloader:
                 'outtmpl': str(self.download_dir / f'{safe_title}_nocookie.%(ext)s'),
                 'noplaylist': True,
                 'quiet': True,
+                'cachedir': str(self.download_dir / "yt-dlp-cache"),
+                'ignoreerrors': True,
             }
             
             loop = asyncio.get_event_loop()
@@ -305,6 +312,7 @@ class BilibiliDownloader:
             ydl_opts = {
                 'quiet': True,
                 'no_warnings': True,
+                'cachedir': str(self.download_dir / "yt-dlp-cache"),
             }
             
             if self.browser:

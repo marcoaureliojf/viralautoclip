@@ -19,6 +19,10 @@ class ProviderType(Enum):
     OPENAI = "openai"        # OpenAI
     GEMINI = "gemini"        # Google Gemini
     SILICONFLOW = "siliconflow"  # 硅基流动
+    GROQ = "groq"            # Groq
+    TOGETHER = "together"    # Together AI
+    OPENROUTER = "openrouter" # OpenRouter
+    G4F = "g4f"              # GPT4Free (Custo Zero)
 
 @dataclass
 class ModelInfo:
@@ -405,6 +409,195 @@ class SiliconFlowProvider(LLMProvider):
             )
         ]
 
+class GroqProvider(LLMProvider):
+    """Groq提供商 (极速)"""
+    
+    def __init__(self, api_key: str, model_name: str = "llama-3.1-70b-versatile", **kwargs):
+        super().__init__(api_key, model_name, **kwargs)
+        try:
+            import openai
+            self.client = openai.OpenAI(
+                api_key=api_key,
+                base_url="https://api.groq.com/openai/v1"
+            )
+        except ImportError:
+            raise ImportError("请安装openai: pip install openai")
+    
+    def call(self, prompt: str, input_data: Any = None, **kwargs) -> LLMResponse:
+        try:
+            full_input = self._build_full_input(prompt, input_data)
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": full_input}],
+                **kwargs
+            )
+            return LLMResponse(
+                content=response.choices[0].message.content,
+                model=self.model_name,
+                finish_reason=response.choices[0].finish_reason
+            )
+        except Exception as e:
+            logger.error(f"Groq调用失败: {str(e)}")
+            raise
+
+    def test_connection(self) -> bool:
+        try:
+            self.call("Hi", max_tokens=5)
+            return True
+        except:
+            return False
+
+    def get_available_models(self) -> List[ModelInfo]:
+        return [
+            ModelInfo("llama-3.1-70b-versatile", "Llama 3.1 70B (Groq)", ProviderType.GROQ, 32768),
+            ModelInfo("llama-3.1-8b-instant", "Llama 3.1 8B (Groq)", ProviderType.GROQ, 8192),
+            ModelInfo("mixtral-8x7b-32768", "Mixtral 8x7B (Groq)", ProviderType.GROQ, 32768),
+        ]
+
+class TogetherProvider(LLMProvider):
+    """Together AI提供商"""
+    
+    def __init__(self, api_key: str, model_name: str = "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", **kwargs):
+        super().__init__(api_key, model_name, **kwargs)
+        try:
+            import openai
+            self.client = openai.OpenAI(
+                api_key=api_key,
+                base_url="https://api.together.xyz/v1"
+            )
+        except ImportError:
+            raise ImportError("请安装openai: pip install openai")
+    
+    def call(self, prompt: str, input_data: Any = None, **kwargs) -> LLMResponse:
+        try:
+            full_input = self._build_full_input(prompt, input_data)
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": full_input}],
+                **kwargs
+            )
+            return LLMResponse(
+                content=response.choices[0].message.content,
+                model=self.model_name,
+                finish_reason=response.choices[0].finish_reason
+            )
+        except Exception as e:
+            logger.error(f"Together调用失败: {str(e)}")
+            raise
+
+    def test_connection(self) -> bool:
+        try:
+            self.call("Hi", max_tokens=5)
+            return True
+        except:
+            return False
+
+    def get_available_models(self) -> List[ModelInfo]:
+        return [
+            ModelInfo("meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", "Llama 3.1 70B (Together)", ProviderType.TOGETHER, 131072),
+            ModelInfo("meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo", "Llama 3.1 8B (Together)", ProviderType.TOGETHER, 131072),
+        ]
+
+class OpenRouterProvider(LLMProvider):
+    """OpenRouter提供商"""
+    
+    def __init__(self, api_key: str, model_name: str = "google/gemini-flash-1.5", **kwargs):
+        super().__init__(api_key, model_name, **kwargs)
+        try:
+            import openai
+            self.client = openai.OpenAI(
+                api_key=api_key,
+                base_url="https://openrouter.ai/api/v1"
+            )
+        except ImportError:
+            raise ImportError("请安装openai: pip install openai")
+    
+    def call(self, prompt: str, input_data: Any = None, **kwargs) -> LLMResponse:
+        try:
+            full_input = self._build_full_input(prompt, input_data)
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": full_input}],
+                **kwargs
+            )
+            return LLMResponse(
+                content=response.choices[0].message.content,
+                model=self.model_name,
+                finish_reason=response.choices[0].finish_reason
+            )
+        except Exception as e:
+            logger.error(f"OpenRouter调用失败: {str(e)}")
+            raise
+
+    def test_connection(self) -> bool:
+        try:
+            self.call("Hi", max_tokens=5)
+            return True
+        except:
+            return False
+
+    def get_available_models(self) -> List[ModelInfo]:
+        return [
+            ModelInfo("google/gemini-flash-1.5", "Gemini Flash 1.5 (OpenRouter)", ProviderType.OPENROUTER, 1000000),
+            ModelInfo("anthropic/claude-3.5-sonnet", "Claude 3.5 Sonnet (OpenRouter)", ProviderType.OPENROUTER, 200000),
+            ModelInfo("meta-llama/llama-3.1-405b", "Llama 3.1 405B (OpenRouter)", ProviderType.OPENROUTER, 131072),
+        ]
+
+class G4FProvider(LLMProvider):
+    """GPT4Free提供商 (Custo Zero)"""
+    
+    def __init__(self, api_key: str = "not-needed", model_name: str = "gpt-4o", **kwargs):
+        super().__init__(api_key, model_name, **kwargs)
+        try:
+            import g4f
+            self.g4f = g4f
+        except ImportError:
+            raise ImportError("请安装g4f: pip install g4f")
+    
+    def call(self, prompt: str, input_data: Any = None, **kwargs) -> LLMResponse:
+        try:
+            full_input = self._build_full_input(prompt, input_data)
+            
+            # g4f 的模型映射
+            model = self.g4f.models.gpt_4o
+            if hasattr(self.g4f.models, self.model_name):
+                model = getattr(self.g4f.models, self.model_name)
+            
+            response = self.g4f.ChatCompletion.create(
+                model=model,
+                messages=[{"role": "user", "content": full_input}],
+                **kwargs
+            )
+            
+            # 清理响应内容 (处理 JSON 块)
+            content = str(response)
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0].strip()
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0].strip()
+            
+            return LLMResponse(
+                content=content,
+                model=self.model_name
+            )
+        except Exception as e:
+            logger.error(f"G4F调用失败: {str(e)}")
+            raise
+
+    def test_connection(self) -> bool:
+        try:
+            self.call("Hi")
+            return True
+        except:
+            return False
+
+    def get_available_models(self) -> List[ModelInfo]:
+        return [
+            ModelInfo("gpt-4o", "GPT-4o (G4F)", ProviderType.G4F, 4096),
+            ModelInfo("gpt-4", "GPT-4 (G4F)", ProviderType.G4F, 4096),
+            ModelInfo("claude-3.5-sonnet", "Claude 3.5 Sonnet (G4F)", ProviderType.G4F, 4096),
+        ]
+
 class LLMProviderFactory:
     """LLM提供商工厂"""
     
@@ -413,6 +606,10 @@ class LLMProviderFactory:
         ProviderType.OPENAI: OpenAIProvider,
         ProviderType.GEMINI: GeminiProvider,
         ProviderType.SILICONFLOW: SiliconFlowProvider,
+        ProviderType.GROQ: GroqProvider,
+        ProviderType.TOGETHER: TogetherProvider,
+        ProviderType.OPENROUTER: OpenRouterProvider,
+        ProviderType.G4F: G4FProvider,
     }
     
     @classmethod

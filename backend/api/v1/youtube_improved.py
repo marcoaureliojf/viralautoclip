@@ -127,6 +127,8 @@ class YouTubeDownloader:
             # 设置超时
             'socket_timeout': 30,
             'retries': 3,
+            'cachedir': str(output_dir / "yt-dlp-cache"),
+            'ignoreerrors': True,
         }
         
         # 如果指定了浏览器，使用cookies

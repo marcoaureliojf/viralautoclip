@@ -1,10 +1,10 @@
 import React from 'react'
 import { Badge, Tooltip } from 'antd'
 import { Project } from '../store/useProjectStore'
-// import { 
-//   getProjectStatusConfig, 
-//   normalizeProjectStatus 
-// } from '../utils/statusUtils'
+import { 
+  getProjectStatusConfig, 
+  normalizeProjectStatus 
+} from '../utils/statusUtils'
 
 interface ProjectStatusIndicatorProps {
   project: Project
@@ -17,7 +17,8 @@ const ProjectStatusIndicator: React.FC<ProjectStatusIndicatorProps> = ({
   size = 'default'
 }) => {
   // 暂时使用简单的状态处理
-  const normalizedStatus = project.status === 'error' ? 'failed' : project.status
+  const normalizedStatus = normalizeProjectStatus(project.status)
+  const config = getProjectStatusConfig(normalizedStatus)
 
   const getStepName = () => {
     if (normalizedStatus === 'processing' && project.current_step) {
@@ -58,7 +59,7 @@ const ProjectStatusIndicator: React.FC<ProjectStatusIndicatorProps> = ({
       minHeight: '24px'
     }}>
       <span style={{ marginRight: '4px', display: 'flex', alignItems: 'center' }}>
-        {config.text}
+        <config.icon />
       </span>
       <span>{config.text}</span>
     </div>

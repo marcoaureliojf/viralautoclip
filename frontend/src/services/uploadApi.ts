@@ -153,11 +153,11 @@ export const uploadApi = {
     return api.post(`/upload/projects/${projectId}/upload`, uploadData)
   },
 
-  retryUploadTask: async (recordId: string): Promise<{message: string}> => {
+  retryUploadTask: async (recordId: string | number): Promise<{message: string}> => {
     return api.post(`/upload/records/${recordId}/retry`)
   },
 
-  cancelUploadTask: async (recordId: string): Promise<{message: string}> => {
+  cancelUploadTask: async (recordId: string | number): Promise<{message: string}> => {
     return api.post(`/upload/records/${recordId}/cancel`)
   },
 

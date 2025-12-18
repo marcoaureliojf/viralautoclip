@@ -7,12 +7,12 @@ import {
   ExclamationCircleOutlined,
   ReloadOutlined
 } from '@ant-design/icons';
-import { TaskProgress } from './TaskProgress';
+import TaskProgress from './TaskProgress';
 import { NotificationList } from './NotificationList';
 // import { useWebSocket, WebSocketEventMessage } from '../hooks/useWebSocket'  // 已禁用WebSocket系统;
 import { useNotifications } from '../hooks/useNotifications';
 import { useProjectStore } from '../store/useProjectStore';
-import { projectApi } from '../api/projectApi';
+import { projectApi } from '../services/api';
 
 const { Text } = Typography;
 
@@ -32,7 +32,7 @@ export const RealTimeStatus: React.FC<RealTimeStatusProps> = ({ userId }) => {
     console.log('📤 开始加载项目任务:', projectId);
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/tasks/project/${projectId}`);
+      const response = await fetch(`/api/v1/tasks/project/${projectId}`);
       console.log('📡 API响应状态:', response.status);
       
       if (response.ok) {
@@ -269,7 +269,8 @@ export const RealTimeStatus: React.FC<RealTimeStatusProps> = ({ userId }) => {
                 tasks.map((task) => (
                   <TaskProgress 
                     key={task.id} 
-                    task={task} 
+                    taskId={task.id}
+                    status={task.status}
                     projectId={task.project_id || userId} // 使用任务的项目ID，如果没有则使用userId作为fallback
                   />
                 ))

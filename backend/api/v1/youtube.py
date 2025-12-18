@@ -74,6 +74,7 @@ async def parse_youtube_video(
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
+            'cachedir': str(get_data_directory() / "temp" / "yt-dlp-cache"),
         }
         
         if browser:
@@ -119,6 +120,7 @@ async def create_youtube_download_task(request: YouTubeDownloadRequest):
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
+            'cachedir': str(get_data_directory() / "temp" / "yt-dlp-cache"),
         }
         
         if request.browser:
@@ -326,6 +328,8 @@ async def process_youtube_download_task(task_id: str, request: YouTubeDownloadRe
             'noplaylist': True,
             'quiet': True,
             'no_warnings': False,  # 显示警告信息以便调试
+            'cachedir': str(get_data_directory() / "temp" / "yt-dlp-cache"),
+            'ignoreerrors': True,  # 忽略错误，如字幕下载失败不应影响视频下载
         }
         
         if request.browser:
@@ -602,6 +606,7 @@ async def _try_download_with_different_formats(url: str, download_dir: Path, bro
                 'outtmpl': str(download_dir / f'subtitle_%(title)s.%(ext)s'),
                 'noplaylist': True,
                 'quiet': True,
+                'cachedir': str(get_data_directory() / "temp" / "yt-dlp-cache"),
             }
             
             if browser:
@@ -658,6 +663,7 @@ async def _try_download_with_different_langs(url: str, download_dir: Path, brows
                 'outtmpl': str(download_dir / f'lang_%(title)s.%(ext)s'),
                 'noplaylist': True,
                 'quiet': True,
+                'cachedir': str(get_data_directory() / "temp" / "yt-dlp-cache"),
             }
             
             if browser:
@@ -691,6 +697,7 @@ async def _try_extract_from_metadata(url: str, download_dir: Path, browser: Opti
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
+            'cachedir': str(get_data_directory() / "temp" / "yt-dlp-cache"),
         }
         
         if browser:

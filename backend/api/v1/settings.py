@@ -77,7 +77,7 @@ def save_settings(settings: Dict[str, Any]):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"保存设置失败: {e}")
 
-@router.get("/")
+@router.get("")
 async def get_settings():
     """获取系统设置"""
     try:
@@ -87,7 +87,7 @@ async def get_settings():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"加载设置失败: {e}")
 
-@router.post("/")
+@router.post("")
 async def update_settings(request: SettingsRequest):
     """更新系统设置"""
     try:

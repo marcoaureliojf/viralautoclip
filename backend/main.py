@@ -1,9 +1,12 @@
 """FastAPI应用入口点"""
 
 import logging
-from fastapi import FastAPI
+import os
+from typing import Optional
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 # 导入配置管理
 from .core.config import settings, get_logging_config, get_api_key
@@ -82,57 +85,59 @@ app.add_middleware(
 app.include_router(api_router, prefix="/api/v1")
 
 # 添加独立的video-categories端点
+from .utils.i18n import t
+
 @app.get("/api/v1/video-categories")
-async def get_video_categories():
+async def get_video_categories(lang: Optional[str] = Query("zh", description="Language for category names and descriptions")):
     """获取视频分类配置."""
     return {
         "categories": [
             {
                 "value": "default",
-                "name": "默认",
-                "description": "通用视频内容处理",
+                "name": t("cat_default", lang),
+                "description": t("cat_default_desc", lang),
                 "icon": "🎬",
                 "color": "#4facfe"
             },
             {
                 "value": "knowledge",
-                "name": "知识科普",
-                "description": "科学、技术、历史、文化等知识类内容",
+                "name": t("cat_knowledge", lang),
+                "description": t("cat_knowledge_desc", lang),
                 "icon": "📚",
                 "color": "#52c41a"
             },
             {
                 "value": "entertainment",
-                "name": "娱乐",
-                "description": "游戏、音乐、电影等娱乐内容",
+                "name": t("cat_entertainment", lang),
+                "description": t("cat_entertainment_desc", lang),
                 "icon": "🎮",
                 "color": "#722ed1"
             },
             {
                 "value": "business",
-                "name": "商业",
-                "description": "商业、创业、投资等商业内容",
+                "name": t("cat_business", lang),
+                "description": t("cat_business_desc", lang),
                 "icon": "💼",
                 "color": "#fa8c16"
             },
             {
                 "value": "experience",
-                "name": "经验分享",
-                "description": "个人经历、生活感悟等经验内容",
+                "name": t("cat_experience", lang),
+                "description": t("cat_experience_desc", lang),
                 "icon": "🌟",
                 "color": "#eb2f96"
             },
             {
                 "value": "opinion",
-                "name": "观点评论",
-                "description": "时事评论、观点分析等评论内容",
+                "name": t("cat_opinion", lang),
+                "description": t("cat_opinion_desc", lang),
                 "icon": "💭",
                 "color": "#13c2c2"
             },
             {
                 "value": "speech",
-                "name": "演讲",
-                "description": "公开演讲、讲座等演讲内容",
+                "name": t("cat_speech", lang),
+                "description": t("cat_speech_desc", lang),
                 "icon": "🎤",
                 "color": "#f5222d"
             }
@@ -143,7 +148,29 @@ async def get_video_categories():
 from .core.error_middleware import global_exception_handler
 
 # 注册全局异常处理器
+# 注册全局异常处理器
 app.add_exception_handler(Exception, global_exception_handler)
+
+# 挂载前端静态文件
+frontend_dist = "/app/frontend/dist"
+if os.path.exists(frontend_dist):
+    # 挂载assets目录
+    app.mount("/assets", StaticFiles(directory=f"{frontend_dist}/assets"), name="assets")
+    
+    # 挂载其他静态文件（如果有）
+    # app.mount("/static", StaticFiles(directory=f"{frontend_dist}/static"), name="static")
+
+    # 处理SPA路由 - 这必须是最后一个路由
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        # 如果是API路径但未匹配到（404），仍然返回404而不是index.html
+        if full_path.startswith("api/"):
+            return JSONResponse(status_code=404, content={"detail": "API endpoint not found"})
+            
+        # 否则返回index.html
+        return FileResponse(f"{frontend_dist}/index.html")
+else:
+    logger.warning(f"前端静态文件目录不存在: {frontend_dist}")
 
 if __name__ == "__main__":
     import uvicorn

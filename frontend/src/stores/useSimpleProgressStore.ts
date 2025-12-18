@@ -33,7 +33,7 @@ interface SimpleProgressState {
 }
 
 export const useSimpleProgressStore = create<SimpleProgressState>((set, get) => {
-  let timer: NodeJS.Timeout | null = null
+  let timer: any | null = null
 
   return {
     // 初始状态
@@ -71,7 +71,7 @@ export const useSimpleProgressStore = create<SimpleProgressState>((set, get) => 
       const fetchSnapshots = async () => {
         try {
           const queryString = projectIds.map(id => `project_ids=${id}`).join('&')
-          const response = await fetch(`http://localhost:8000/api/v1/simple-progress/snapshot?${queryString}`)
+          const response = await fetch(`/api/v1/simple-progress/snapshot?${queryString}`)
           
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`)
@@ -145,14 +145,14 @@ export const useSimpleProgressStore = create<SimpleProgressState>((set, get) => 
   }
 })
 
-// 阶段显示名称映射
+// 阶段显示名称映射 - 使用 i18n key
 export const STAGE_DISPLAY_NAMES: Record<string, string> = {
-  'INGEST': '素材准备',
-  'SUBTITLE': '字幕处理',
-  'ANALYZE': '内容分析', 
-  'HIGHLIGHT': '片段定位',
-  'EXPORT': '视频导出',
-  'DONE': '处理完成'
+  'INGEST': 'stages.ingest',
+  'SUBTITLE': 'stages.subtitle',
+  'ANALYZE': 'stages.analyze', 
+  'HIGHLIGHT': 'stages.highlight',
+  'EXPORT': 'stages.export',
+  'DONE': 'stages.done'
 }
 
 // 阶段颜色映射
@@ -182,5 +182,9 @@ export const isCompleted = (stage: string): boolean => {
 
 // 判断是否为失败状态
 export const isFailed = (message: string): boolean => {
-  return message.includes('失败') || message.includes('错误') || message.includes('失败')
+  if (!message) return false
+  const lowerMessage = message.toLowerCase()
+  return lowerMessage.includes('失败') || lowerMessage.includes('错误') || 
+         lowerMessage.includes('failed') || lowerMessage.includes('error') ||
+         lowerMessage.includes('falhou') || lowerMessage.includes('erro')
 }

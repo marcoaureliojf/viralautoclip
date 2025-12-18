@@ -5,6 +5,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { Progress, Space, Typography, Tag } from 'antd'
+import { useTranslation } from 'react-i18next'
 import { 
   DownloadOutlined, 
   LoadingOutlined, 
@@ -31,6 +32,7 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
   onStatusChange,
   onDownloadProgressUpdate
 }) => {
+  const { t } = useTranslation()
   const { getProgress, startPolling, stopPolling } = useSimpleProgressStore()
   const [isPolling, setIsPolling] = useState(false)
   const [currentDownloadProgress, setCurrentDownloadProgress] = useState(downloadProgress)
@@ -39,11 +41,11 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
 
   // 根据状态决定是否轮询
   useEffect(() => {
-    if ((status === 'processing' || status === 'pending') && !isPolling) {
+    if ((status === 'processing' || status === 'pending' || status === 'importing') && !isPolling) {
       console.log(`开始轮询处理进度: ${projectId}`)
       startPolling([projectId], 2000)
       setIsPolling(true)
-    } else if (status !== 'processing' && status !== 'pending' && isPolling) {
+    } else if (status !== 'processing' && status !== 'pending' && status !== 'importing' && isPolling) {
       console.log(`停止轮询处理进度: ${projectId}`)
       stopPolling()
       setIsPolling(false)
@@ -64,7 +66,7 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
       const pollDownloadProgress = async () => {
         try {
           console.log(`轮询下载进度: ${projectId}`)
-          const response = await fetch(`http://localhost:8000/api/v1/projects/${projectId}`)
+          const response = await fetch(`/api/v1/projects/${projectId}`)
           if (response.ok) {
             const projectData = await response.json()
             console.log('项目数据:', projectData)
@@ -111,6 +113,41 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
 
   // 导入中状态
   if (status === 'importing') {
+    // 如果有实时进度数据，优先使用实时进度
+    if (progress) {
+      const { stage, percent, message } = progress
+      const stageDisplayName = getStageDisplayName(stage)
+      const failed = isFailed(message)
+
+      return (
+        <div style={{
+          background: failed ? 'rgba(255, 77, 79, 0.1)' : 'rgba(255, 193, 7, 0.1)',
+          border: failed ? '1px solid rgba(255, 77, 79, 0.3)' : '1px solid rgba(255, 193, 7, 0.3)',
+          borderRadius: '3px',
+          padding: '3px 6px',
+          textAlign: 'center',
+          width: '100%'
+        }}>
+          <div style={{ 
+            color: failed ? '#ff4d4f' : '#ffc107',
+            fontSize: '11px', 
+            fontWeight: 600, 
+            lineHeight: '12px'
+          }}>
+            {failed ? t('status.failed_short') : `${percent}%`}
+          </div>
+          <div style={{ 
+            color: '#999999', 
+            fontSize: '8px', 
+            lineHeight: '9px'
+          }}>
+            {failed ? '' : t(stageDisplayName)}
+          </div>
+        </div>
+      )
+    }
+
+    // 否则显示传入的 downloadProgress (默认为20%)
     return (
       <div style={{
         background: 'rgba(255, 193, 7, 0.1)',
@@ -133,7 +170,7 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
           fontSize: '8px', 
           lineHeight: '9px'
         }}>
-          导入中
+          {t('status.importing')}
         </div>
       </div>
     )
@@ -163,7 +200,7 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
           fontSize: '8px', 
           lineHeight: '9px'
         }}>
-          下载中
+          {t('status.downloading')}
         </div>
       </div>
     )
@@ -195,7 +232,7 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
           fontSize: '8px', 
           lineHeight: '9px'
         }}>
-          初始化中...
+          {t('status.initializing')}
         </div>
       </div>
       )
@@ -225,7 +262,7 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
           fontWeight: 600, 
           lineHeight: '12px'
         }}>
-          {failed ? '✗ 失败' : `${percent}%`}
+          {failed ? t('status.failed_short') : `${percent}%`}
         </div>
         <div style={{ 
           color: '#999999', 
@@ -233,7 +270,7 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
           lineHeight: '9px',
           minHeight: '9px' // 确保失败状态也有固定高度
         }}>
-          {failed ? '' : stageDisplayName}
+          {failed ? '' : t(stageDisplayName)}
         </div>
       </div>
     )
@@ -256,14 +293,14 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
           fontWeight: 600, 
           lineHeight: '12px'
         }}>
-          ✓
+          {t('status.completed_short')}
         </div>
         <div style={{ 
           color: '#999999', 
           fontSize: '8px', 
           lineHeight: '9px'
         }}>
-          已完成
+          {t('status.completed')}
         </div>
       </div>
     )
@@ -286,7 +323,7 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
           fontWeight: 600, 
           lineHeight: '12px'
         }}>
-          ✗ 失败
+          {t('status.failed_short')}
         </div>
         <div style={{ 
           color: '#999999', 
@@ -294,7 +331,7 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
           lineHeight: '9px',
           minHeight: '9px' // 确保失败状态也有固定高度
         }}>
-          处理失败
+          {t('status.failed')}
         </div>
       </div>
     )
@@ -316,7 +353,7 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
         fontWeight: 600, 
         lineHeight: '12px'
       }}>
-        ○ 等待中
+        ○ {t('status.pending')}
       </div>
       <div style={{ 
         color: '#999999', 
@@ -324,7 +361,7 @@ export const UnifiedStatusBar: React.FC<UnifiedStatusBarProps> = ({
         lineHeight: '9px',
         minHeight: '9px' // 确保等待状态也有固定高度
       }}>
-        等待处理
+        {t('status.pending')}
       </div>
     </div>
   )
@@ -342,6 +379,7 @@ export const SimpleProgressDisplay: React.FC<SimpleProgressDisplayProps> = ({
   status,
   showDetails = false
 }) => {
+  const { t } = useTranslation()
   const { getProgress } = useSimpleProgressStore()
   const progress = getProgress(projectId)
 
@@ -362,11 +400,9 @@ export const SimpleProgressDisplay: React.FC<SimpleProgressDisplayProps> = ({
         size="small"
         format={(percent) => `${percent}%`}
       />
-      {message && (
-        <Text type="secondary" style={{ fontSize: '11px', display: 'block', marginTop: '4px' }}>
-          {message}
-        </Text>
-      )}
+      <Text type="secondary" style={{ fontSize: '11px', display: 'block', marginTop: '4px' }}>
+        {t(stageDisplayName)}
+      </Text>
     </div>
   )
 }

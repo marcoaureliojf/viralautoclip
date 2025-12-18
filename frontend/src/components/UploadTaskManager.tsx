@@ -37,13 +37,13 @@ const { Option } = Select
 const { Text } = Typography
 
 interface UploadTask {
-  id: string
-  project_id: string
-  account_id: string
+  id: string | number
+  project_id?: string
+  account_id: string | number
   clip_id: string
   title: string
-  description: string
-  tags: string
+  description?: string
+  tags?: string
   partition_id: number
   bvid?: string
   status: string
@@ -86,7 +86,7 @@ const UploadTaskManager: React.FC<UploadTaskManagerProps> = ({ projectId }) => {
   }
 
   // 重试失败的任务
-  const retryTask = async (taskId: string) => {
+  const retryTask = async (taskId: string | number) => {
     message.info('B站上传功能正在开发中，敬请期待！', 3);
     return;
     
@@ -101,7 +101,7 @@ const UploadTaskManager: React.FC<UploadTaskManagerProps> = ({ projectId }) => {
   }
 
   // 取消进行中的任务
-  const cancelTask = async (taskId: string) => {
+  const cancelTask = async (taskId: string | number) => {
     message.info('B站上传功能正在开发中，敬请期待！', 3);
     return;
     
@@ -136,7 +136,7 @@ const UploadTaskManager: React.FC<UploadTaskManagerProps> = ({ projectId }) => {
     if (filters.keyword) {
       filtered = filtered.filter(task => 
         task.title.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-        task.description.toLowerCase().includes(filters.keyword.toLowerCase())
+        (task.description || '').toLowerCase().includes(filters.keyword.toLowerCase())
       )
     }
 
@@ -238,7 +238,7 @@ const UploadTaskManager: React.FC<UploadTaskManagerProps> = ({ projectId }) => {
         <div>
           <div style={{ fontWeight: 'bold' }}>{record.title}</div>
           <div style={{ fontSize: '12px', color: '#666' }}>
-            项目ID: {record.project_id.slice(0, 8)}...
+            项目ID: {(record.project_id || '').slice(0, 8)}....
           </div>
         </div>
       )

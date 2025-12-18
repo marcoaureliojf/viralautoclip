@@ -49,12 +49,17 @@ export interface TaskProgressUpdateMessage extends WebSocketMessage {
   snapshot?: boolean; // 标记是否为快照消息
 }
 
+export interface PongMessage extends WebSocketMessage {
+  type: 'pong';
+}
+
 export type WebSocketEventMessage = 
   | TaskUpdateMessage 
   | ProjectUpdateMessage 
   | SystemNotificationMessage 
   | ErrorNotificationMessage
-  | TaskProgressUpdateMessage;
+  | TaskProgressUpdateMessage
+  | PongMessage;
 
 interface UseWebSocketOptions {
   userId: string;
@@ -148,16 +153,17 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
     }
 
     setConnectionStatus('connecting');
-    const wsUrl = `ws://localhost:8000/api/v1/ws/${userId}`;
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${wsProtocol}//${window.location.host}/api/v1/ws/${userId}`;
     
     try {
       const ws = new WebSocket(wsUrl);
       globalWs = ws;
       globalUserId = userId;
-      globalOnMessage = onMessage;
-      globalOnConnect = onConnect;
-      globalOnDisconnect = onDisconnect;
-      globalOnError = onError;
+      globalOnMessage = onMessage || null;
+      globalOnConnect = onConnect || null;
+      globalOnDisconnect = onDisconnect || null;
+      globalOnError = onError || null;
 
       ws.onopen = () => {
         console.log('WebSocket连接已建立');

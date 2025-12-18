@@ -19,6 +19,8 @@ from backend.schemas.project import (
 )
 from backend.schemas.base import PaginationParams
 from pathlib import Path
+from backend.utils.i18n import t
+from backend.core.dependencies import get_lang
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -313,14 +315,15 @@ async def update_project(
 @router.delete("/{project_id}")
 async def delete_project(
     project_id: str,
-    project_service: ProjectService = Depends(get_project_service)
+    project_service: ProjectService = Depends(get_project_service),
+    lang: str = Depends(get_lang)
 ):
     """Delete a project and all its related files."""
     try:
         success = project_service.delete_project_with_files(project_id)
         if not success:
             raise HTTPException(status_code=404, detail="Project not found")
-        return {"message": "Project and all related files deleted successfully"}
+        return {"message": t("project_deleted", lang=lang)}
     except HTTPException:
         raise
     except Exception as e:
@@ -329,7 +332,8 @@ async def delete_project(
 
 @router.post("/sync-all-data")
 async def sync_all_projects_data(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    lang: str = Depends(get_lang)
 ):
     """同步所有项目的数据到数据库"""
     try:
@@ -342,7 +346,7 @@ async def sync_all_projects_data(
         result = sync_service.sync_all_projects_from_filesystem(data_dir)
         
         return {
-            "message": "数据同步完成",
+            "message": t("data_sync_success", lang=lang),
             "result": result
         }
     except Exception as e:
@@ -352,7 +356,8 @@ async def sync_all_projects_data(
 @router.post("/{project_id}/sync-data")
 async def sync_project_data(
     project_id: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    lang: str = Depends(get_lang)
 ):
     """同步指定项目的数据到数据库"""
     try:
@@ -368,7 +373,7 @@ async def sync_project_data(
         
         if result.get("success"):
             return {
-                "message": "项目数据同步成功",
+                "message": t("project_sync_success", lang=lang),
                 "result": result
             }
         else:
@@ -384,7 +389,8 @@ async def start_processing(
     project_id: str,
     project_service: ProjectService = Depends(get_project_service),
     processing_service: ProcessingService = Depends(get_processing_service),
-    websocket_service: WebSocketNotificationService = Depends(get_websocket_service)
+    websocket_service: WebSocketNotificationService = Depends(get_websocket_service),
+    lang: str = Depends(get_lang)
 ):
     """Start processing a project using Celery task queue."""
     try:
@@ -450,7 +456,7 @@ async def start_processing(
         )
         
         return {
-            "message": "Processing started successfully",
+            "message": t("processing_started", lang=lang),
             "project_id": project_id,
             "task_id": task_result.id,
             "celery_task_id": celery_task.id,
@@ -477,7 +483,8 @@ async def retry_processing(
     project_id: str,
     project_service: ProjectService = Depends(get_project_service),
     processing_service: ProcessingService = Depends(get_processing_service),
-    websocket_service: WebSocketNotificationService = Depends(get_websocket_service)
+    websocket_service: WebSocketNotificationService = Depends(get_websocket_service),
+    lang: str = Depends(get_lang)
 ):
     """Retry processing a project from the beginning."""
     try:
@@ -558,7 +565,7 @@ async def retry_processing(
                         )
                         
                         return {
-                            "message": "视频文件不存在，已开始重新下载B站视频",
+                            "message": t("bilibili_redownload", lang=lang),
                             "project_id": project_id,
                             "download_task_id": download_task_id,
                             "source_url": source_url
@@ -589,7 +596,7 @@ async def retry_processing(
                         )
                         
                         return {
-                            "message": "视频文件不存在，已开始重新下载YouTube视频",
+                            "message": t("youtube_redownload", lang=lang),
                             "project_id": project_id,
                             "download_task_id": download_task_id,
                             "source_url": source_url
@@ -623,7 +630,7 @@ async def retry_processing(
         processing_service.db.commit()
         
         return {
-            "message": "Processing retry started successfully",
+            "message": t("retry_started", lang=lang),
             "project_id": project_id,
             "task_id": task_result.id,
             "celery_task_id": celery_task.id,
@@ -650,7 +657,8 @@ async def resume_processing(
     project_id: str,
     start_step: str = Form(..., description="Step to resume from (step1_outline, step2_timeline, etc.)"),
     project_service: ProjectService = Depends(get_project_service),
-    processing_service: ProcessingService = Depends(get_processing_service)
+    processing_service: ProcessingService = Depends(get_processing_service),
+    lang: str = Depends(get_lang)
 ):
     """Resume processing from a specific step."""
     try:
@@ -678,7 +686,7 @@ async def resume_processing(
         result = processing_service.resume_processing(project_id, start_step, srt_path)
         
         return {
-            "message": f"Processing resumed from {start_step} successfully",
+            "message": t("resume_success", lang=lang, step=start_step),
             "project_id": project_id,
             "start_step": start_step,
             "result": result
@@ -768,7 +776,8 @@ async def get_project_logs(
 @router.get("/{project_id}/import-status")
 async def get_import_status(
     project_id: str,
-    project_service: ProjectService = Depends(get_project_service)
+    project_service: ProjectService = Depends(get_project_service),
+    lang: str = Depends(get_lang)
 ):
     """获取项目导入状态"""
     try:
@@ -785,7 +794,7 @@ async def get_import_status(
         return {
             "project_id": project_id,
             "status": project.status.value,
-            "message": "导入状态正常"
+            "message": t("import_status_normal", lang=lang)
         }
         
     except HTTPException:

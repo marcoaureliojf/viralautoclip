@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Project } from '../store/useProjectStore'
 import { projectApi } from '../services/api'
 import { UnifiedStatusBar } from './UnifiedStatusBar'
+import { useTranslation } from 'react-i18next'
 // import { 
 //   getProjectStatusConfig, 
 //   calculateProjectProgress, 
@@ -20,7 +21,7 @@ import 'dayjs/locale/zh-cn'
 dayjs.extend(relativeTime)
 dayjs.extend(timezone)
 dayjs.extend(utc)
-dayjs.locale('zh-cn')
+// dayjs locale is handled via i18n
 
 // 添加CSS动画样式
 const pulseAnimation = `
@@ -65,6 +66,7 @@ interface LogEntry {
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, onClick }) => {
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null)
   const [thumbnailLoading, setThumbnailLoading] = useState(false)
@@ -75,14 +77,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
   // 获取分类信息
   const getCategoryInfo = (category?: string) => {
     const categoryMap: Record<string, { name: string; icon: string; color: string }> = {
-      'default': { name: '默认', icon: '🎬', color: '#4facfe' },
-      'knowledge': { name: '知识科普', icon: '📚', color: '#52c41a' },
-      'business': { name: '商业财经', icon: '💼', color: '#faad14' },
-      'opinion': { name: '观点评论', icon: '💭', color: '#722ed1' },
-      'experience': { name: '经验分享', icon: '🌟', color: '#13c2c2' },
-      'speech': { name: '演讲脱口秀', icon: '🎤', color: '#eb2f96' },
-      'content_review': { name: '内容解说', icon: '🎭', color: '#f5222d' },
-      'entertainment': { name: '娱乐内容', icon: '🎪', color: '#fa8c16' }
+      'default': { name: t('categories.default'), icon: '🎬', color: '#4facfe' },
+      'knowledge': { name: t('categories.knowledge'), icon: '📚', color: '#52c41a' },
+      'business': { name: t('categories.business'), icon: '💼', color: '#faad14' },
+      'opinion': { name: t('categories.opinion'), icon: '💭', color: '#722ed1' },
+      'experience': { name: t('categories.experience'), icon: '🌟', color: '#13c2c2' },
+      'speech': { name: t('categories.speech'), icon: '🎤', color: '#eb2f96' },
+      'content_review': { name: t('categories.content_review'), icon: '🎭', color: '#f5222d' },
+      'entertainment': { name: t('categories.entertainment'), icon: '🎪', color: '#fa8c16' }
     }
     return categoryMap[category || 'default'] || categoryMap['default']
   }
@@ -274,7 +276,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
       case 'completed': return 'success'
       case 'processing': return 'processing'
       case 'error': return 'error'
-      case 'uploading': return 'default'
       default: return 'default'
     }
   }
@@ -320,7 +321,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
       }
     } catch (error) {
       console.error('重试失败:', error)
-      message.error('重试失败，请稍后再试')
+      message.error(t('project.processing_failed'))
     } finally {
       setIsRetrying(false)
     }
@@ -373,7 +374,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
           onClick={() => {
             // 导入中状态的项目不能点击进入详情页
             if (project.status === 'pending') {
-              message.warning('项目正在导入中，请稍后再查看详情')
+              message.warning(t('project.importing_warning'))
               return
             }
             
@@ -400,7 +401,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                 fontSize: '12px',
                 fontWeight: 500
               }}>
-                生成封面中...
+                {t('project.generating_thumbnail')}
               </div>
             </div>
           )}
@@ -421,7 +422,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                 fontSize: '12px',
                 fontWeight: 500
               }}>
-                点击预览
+                {t('project.click_preview')}
               </div>
             </div>
           )}
@@ -471,7 +472,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
             height: '28px'
           }}>
             <Text style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)' }}>
-              {dayjs(project.created_at).tz('Asia/Shanghai').fromNow()}
+              {dayjs(project.created_at).locale(i18n.language === 'zh' ? 'zh-cn' : i18n.language).fromNow()}
             </Text>
             
             {/* 操作按钮 */}
@@ -509,8 +510,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                   />
                   
                   <Popconfirm
-                    title="确定要删除这个项目吗？"
-                    description="删除后无法恢复"
+                    title={t('project.delete_confirm')}
+                    description={t('project.delete_desc')}
                     onConfirm={(e) => {
                       e?.stopPropagation()
                       onDelete(project.id)
@@ -518,8 +519,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                     onCancel={(e) => {
                       e?.stopPropagation()
                     }}
-                    okText="确定"
-                    cancelText="取消"
+                    okText={t('common.success')}
+                    cancelText={t('common.retry')}
                   >
                     <Button
                       type="text"
@@ -547,7 +548,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                   <Space size={4}>
                     {/* 重试按钮 - 在处理中和等待中状态显示，允许用户重新提交任务 */}
                     {(normalizedStatus === 'processing' || normalizedStatus === 'importing' || project.status === 'pending') && (
-                      <Tooltip title={project.status === 'pending' ? "开始处理" : "重新提交任务"}>
+                      <Tooltip title={project.status === 'pending' ? t('project.start_processing_tooltip') : t('project.retry_processing_tooltip')}>
                         <Button
                           type="text"
                           icon={<ReloadOutlined />}
@@ -579,7 +580,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                         onClick={(e) => {
                           e.stopPropagation()
                           // 实现下载功能
-                          message.info('下载功能开发中...')
+                          message.info(t('project.download_dev'))
                         }}
                         style={{
                           width: '20px',
@@ -597,8 +598,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                     
                     {/* 删除按钮 */}
                     <Popconfirm
-                      title="确定要删除这个项目吗？"
-                      description="删除后无法恢复"
+                      title={t('project.delete_confirm')}
+                      description={t('project.delete_desc')}
                       onConfirm={(e) => {
                         e?.stopPropagation()
                         onDelete(project.id)
@@ -606,8 +607,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                       onCancel={(e) => {
                         e?.stopPropagation()
                       }}
-                      okText="确定"
-                      cancelText="取消"
+                      okText={t('common.success')}
+                      cancelText={t('common.retry')}
                     >
                       <Button
                         type="text"
@@ -720,7 +721,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                   {project.total_clips || 0}
                 </div>
                 <div style={{ color: '#999999', fontSize: '8px', lineHeight: '9px' }}>
-                  切片
+                  {t('project.clips_label')}
                 </div>
               </div>
               
@@ -738,7 +739,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                   {project.total_collections || 0}
                 </div>
                 <div style={{ color: '#999999', fontSize: '8px', lineHeight: '9px' }}>
-                  合集
+                  {t('project.collections_label')}
                 </div>
               </div>
             </div>

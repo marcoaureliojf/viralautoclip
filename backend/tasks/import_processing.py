@@ -9,6 +9,7 @@ from typing import Optional
 from celery import Celery
 from backend.core.database import get_db
 from backend.services.project_service import ProjectService
+from backend.services.simple_progress import emit_progress
 from backend.utils.thumbnail_generator import generate_project_thumbnail
 from backend.utils.task_submission_utils import submit_video_pipeline_task
 
@@ -36,15 +37,18 @@ def process_import_task(self, project_id: str, video_path: str, srt_file_path: O
         
         # 更新任务进度
         self.update_state(state='PROGRESS', meta={'progress': 10, 'message': '开始处理...'})
+        emit_progress(project_id, "INGEST", "开始处理...", subpercent=10)
         
         # 1. 检查并生成缩略图（如果还没有）
         logger.info(f"检查项目 {project_id} 缩略图...")
         self.update_state(state='PROGRESS', meta={'progress': 20, 'message': '检查缩略图...'})
+        emit_progress(project_id, "INGEST", "检查缩略图...", subpercent=20)
         
         project = project_service.get(project_id)
         if project and not project.thumbnail:
             logger.info(f"项目 {project_id} 没有缩略图，开始生成...")
             self.update_state(state='PROGRESS', meta={'progress': 25, 'message': '生成缩略图...'})
+            emit_progress(project_id, "INGEST", "生成缩略图...", subpercent=25)
             
             try:
                 thumbnail_data = generate_project_thumbnail(project_id, Path(video_path))
@@ -65,6 +69,7 @@ def process_import_task(self, project_id: str, video_path: str, srt_file_path: O
         if not srt_path:
             logger.info(f"开始为项目 {project_id} 生成字幕...")
             self.update_state(state='PROGRESS', meta={'progress': 40, 'message': '生成字幕...'})
+            emit_progress(project_id, "SUBTITLE", "正在生成字幕 (可能需要几分钟)...", subpercent=10)
             
             try:
                 from backend.utils.speech_recognizer import generate_subtitle_for_video
@@ -99,6 +104,7 @@ def process_import_task(self, project_id: str, video_path: str, srt_file_path: O
         # 3. 更新项目状态为处理中
         logger.info(f"更新项目 {project_id} 状态为处理中...")
         self.update_state(state='PROGRESS', meta={'progress': 80, 'message': '启动处理流程...'})
+        emit_progress(project_id, "SUBTITLE", "字幕生成完成", subpercent=100)
         
         project_service.update_project_status(project_id, "processing")
         

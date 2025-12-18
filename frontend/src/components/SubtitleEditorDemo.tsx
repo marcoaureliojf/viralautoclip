@@ -13,6 +13,8 @@ const SubtitleEditorDemo: React.FC = () => {
   const mockSubtitles: SubtitleSegment[] = [
     {
       id: '1',
+      index: 1,
+      text: '欢迎大家使用字影。',
       startTime: 0,
       endTime: 11,
       words: [
@@ -25,6 +27,8 @@ const SubtitleEditorDemo: React.FC = () => {
     },
     {
       id: '2',
+      index: 2,
+      text: '字影是一款',
       startTime: 11,
       endTime: 13,
       words: [
@@ -35,6 +39,8 @@ const SubtitleEditorDemo: React.FC = () => {
     },
     {
       id: '3',
+      index: 3,
+      text: '极致简单的',
       startTime: 13,
       endTime: 14,
       words: [
@@ -44,6 +50,8 @@ const SubtitleEditorDemo: React.FC = () => {
     },
     {
       id: '4',
+      index: 4,
+      text: '视频编辑产品。',
       startTime: 14,
       endTime: 17,
       words: [
@@ -55,6 +63,8 @@ const SubtitleEditorDemo: React.FC = () => {
     },
     {
       id: '5',
+      index: 5,
+      text: '字影最主要',
       startTime: 17,
       endTime: 18,
       words: [
@@ -65,6 +75,8 @@ const SubtitleEditorDemo: React.FC = () => {
     },
     {
       id: '6',
+      index: 6,
+      text: '的创新是通过文字来编辑视频，',
       startTime: 18,
       endTime: 23,
       words: [

@@ -46,12 +46,12 @@ export const useTaskProgress = (options: UseTaskProgressOptions) => {
       
       // 更新状态
       const newState: TaskProgressState = {
-        task_id: progressMessage.task_id,
+        task_id: progressMessage.task_id || taskId,
         progress: progressMessage.progress,
         step: progressMessage.step,
         total: progressMessage.total,
-        phase: progressMessage.phase,
-        message: progressMessage.message,
+        phase: progressMessage.phase || '',
+        message: progressMessage.message || '',
         status: progressMessage.status,
         seq: progressMessage.seq,
         ts: progressMessage.ts,
@@ -67,11 +67,11 @@ export const useTaskProgress = (options: UseTaskProgressOptions) => {
       onProgressUpdate?.(newState);
       
       // 检查终态
-      if (progressMessage.status === 'DONE') {
+      if ((progressMessage.status as string) === 'DONE') {
         onTaskComplete?.(newState);
         // 延迟进行终态校准
         setTimeout(() => performFinalStateCheck(), 1000);
-      } else if (progressMessage.status === 'FAIL') {
+      } else if ((progressMessage.status as string) === 'FAIL') {
         onTaskFailed?.(newState);
         // 延迟进行终态校准
         setTimeout(() => performFinalStateCheck(), 1000);

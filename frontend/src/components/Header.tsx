@@ -2,10 +2,13 @@ import React from 'react'
 import { Layout, Button } from 'antd'
 import { SettingOutlined, HomeOutlined } from '@ant-design/icons'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import LanguageSwitcher from './LanguageSwitcher'
 
 const { Header: AntHeader } = Layout
 
 const Header: React.FC = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const isHomePage = location.pathname === '/'
@@ -63,6 +66,7 @@ const Header: React.FC = () => {
       
       {/* Navigation Buttons */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <LanguageSwitcher />
         {!isHomePage && (
           <Button 
             type="primary"
@@ -78,7 +82,7 @@ const Header: React.FC = () => {
               boxShadow: '0 2px 8px rgba(79, 172, 254, 0.3)'
             }}
           >
-            返回首页
+            {t('nav.home')}
           </Button>
         )}
         
@@ -103,7 +107,7 @@ const Header: React.FC = () => {
             e.currentTarget.style.borderColor = 'transparent'
           }}
         >
-          设置
+          {t('nav.settings')}
         </Button>
       </div>
     </AntHeader>

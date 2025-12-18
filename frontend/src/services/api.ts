@@ -4,7 +4,7 @@ import { Project, Clip, Collection } from '../store/useProjectStore'
 // 格式化时间函数（暂时未使用，保留备用）
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/v1', // FastAPI后端服务器地址
+  baseURL: '/api/v1', // 使用相对路径，适配不同的部署环境
   timeout: 300000, // 增加到5分钟超时
   headers: {
     'Content-Type': 'application/json',
@@ -147,11 +147,13 @@ export const settingsApi = {
   }
 }
 
+import i18n from '../config/i18n'
+
 // 项目相关API
 export const projectApi = {
   // 获取视频分类配置
   getVideoCategories: async (): Promise<VideoCategoriesResponse> => {
-    return api.get('/video-categories')
+    return api.get(`/video-categories?lang=${i18n.language}`)
   },
 
   // 获取所有项目
@@ -203,6 +205,11 @@ export const projectApi = {
   // 获取处理状态
   getProcessingStatus: async (id: string): Promise<ProcessingStatus> => {
     return api.get(`/projects/${id}/status`)
+  },
+
+  // 获取任务进度详情
+  getTaskProgress: async (taskId: string): Promise<any> => {
+    return api.get(`/tasks/${taskId}/progress`)
   },
 
   // 获取项目日志
@@ -318,7 +325,7 @@ export const projectApi = {
   // 更新合集信息
   updateCollection: (_projectId: string, collectionId: string, updates: Partial<Collection>): Promise<Collection> => {
     // 如果updates包含clip_ids，需要将其包装在metadata中
-    const apiUpdates = { ...updates }
+    const apiUpdates: any = { ...updates }
     if ('clip_ids' in updates && updates.clip_ids !== undefined) {
       apiUpdates.metadata = { clip_ids: updates.clip_ids }
       delete apiUpdates.clip_ids
@@ -382,7 +389,7 @@ export const projectApi = {
     
     try {
       // 对于blob类型的响应，需要直接使用axios而不是经过拦截器
-      const response = await axios.get(`http://localhost:8000/api/v1${url}`, { 
+      const response = await axios.get(`/api/v1${url}`, { 
         responseType: 'blob',
         headers: {
           'Accept': 'application/octet-stream'
@@ -442,13 +449,13 @@ export const projectApi = {
   // 获取切片视频URL
   getClipVideoUrl: (projectId: string, clipId: string, _clipTitle?: string): string => {
     // 使用projects路由获取切片视频
-    return `http://localhost:8000/api/v1/projects/${projectId}/clips/${clipId}`
+    return `/api/v1/projects/${projectId}/clips/${clipId}`
   },
 
   // 获取合集视频URL
   getCollectionVideoUrl: (projectId: string, collectionId: string): string => {
     // 使用files路由获取合集视频
-    return `http://localhost:8000/api/v1/files/projects/${projectId}/collections/${collectionId}`
+    return `/api/v1/files/projects/${projectId}/collections/${collectionId}`
   },
 
   // 生成项目缩略图
