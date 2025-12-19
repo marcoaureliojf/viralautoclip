@@ -10,7 +10,15 @@ export PYTHONPATH=/app
 export PYTHONUNBUFFERED=1
 
 # 确保数据目录存在且有正确权限
-mkdir -p /app/data/projects /app/data/uploads /app/data/temp /app/data/output /app/logs
+# 如果遇到权限问题，给出清晰的提示
+for dir in /app/data/projects /app/data/uploads /app/data/temp /app/data/output /app/logs; do
+    if ! mkdir -p "$dir" 2>/dev/null; then
+        echo "❌ ERRO DE PERMISSÃO: Não foi possível criar o diretório $dir"
+        echo "Por favor, execute o seguinte comando no seu terminal (HOST):"
+        echo "sudo chown -R \$USER:\$USER data logs uploads && sudo chmod -R 777 data logs uploads"
+        exit 1
+    fi
+done
 
 # 如果数据目录为空，创建必要的文件
 if [[ ! -f /app/data/autoclip.db ]]; then

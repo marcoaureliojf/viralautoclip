@@ -22,6 +22,10 @@ RUN npm ci
 # 复制前端源代码
 COPY frontend/ ./
 
+# 修复 esbuild 可能的权限问题并构建前确保可执行
+RUN find node_modules/@esbuild -name esbuild -exec chmod +x {} + || true
+RUN if [ -f node_modules/.bin/vite ]; then chmod +x node_modules/.bin/vite; fi
+
 # 构建前端
 RUN npm run build
 
@@ -57,8 +61,9 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONPATH=/app
 
-# 创建非root用户
-RUN groupadd -r autoclip && useradd -r -g autoclip autoclip
+# 创建非root用户 (使用 UID 1000 以匹配大多数 Linux 主机用户)
+RUN groupadd -g 1000 autoclip && \
+    useradd -u 1000 -g autoclip -m -s /bin/bash autoclip
 
 # 安装运行时依赖
 RUN apt-get update && apt-get install -y \
@@ -82,14 +87,12 @@ COPY *.sh ./
 COPY env.example .env
 COPY docker-entrypoint.sh ./
 
-# 创建必要的目录
-RUN mkdir -p data/projects data/uploads data/temp data/output logs
-
-# 设置权限
-RUN chown -R autoclip:autoclip /app
-RUN chmod +x *.sh
-RUN chmod +x docker-entrypoint.sh
-RUN chmod -R 755 data logs
+# 创建必要的目录并确保权限
+RUN mkdir -p data/projects data/uploads data/temp data/output logs && \
+    chown -R autoclip:autoclip /app && \
+    chmod +x *.sh && \
+    chmod +x docker-entrypoint.sh && \
+    chmod -R 775 data logs
 
 # 切换到非root用户
 USER autoclip
