@@ -2,7 +2,7 @@
 
 ## 📋 概述
 
-本项目已实现增强的进度系统，提供统一的进度跟踪、状态管理和错误处理功能。该系统整合了Redis缓存、数据库持久化和内存缓存，确保进度信息的可靠性和实时性。
+本项目已实现增强的进度系统，提供统一的进度跟踪、状态管理和错误处理功能。该系统整合了 Redis 缓存、数据库持久化和内存缓存，确保进度信息的可靠性和实时性。
 
 ## 🏗️ 系统架构
 
@@ -33,7 +33,7 @@ class ProgressStatus(Enum):
 ### 存储层次
 
 1. **内存缓存**: 快速访问，存储当前活跃的进度信息
-2. **Redis缓存**: 分布式缓存，支持多实例共享
+2. **Redis 缓存**: 分布式缓存，支持多实例共享
 3. **数据库持久化**: 长期存储，与项目状态同步
 
 ## 🚀 使用方法
@@ -83,7 +83,7 @@ from backend.services.enhanced_progress_service import (
 from backend.core.error_middleware import handle_errors, ErrorCategory
 
 class VideoProcessingService:
-    
+
     @handle_errors(ErrorCategory.PROCESSING)
     async def process_video(self, project_id: str, video_path: str):
         try:
@@ -92,7 +92,7 @@ class VideoProcessingService:
                 project_id=project_id,
                 initial_message="开始处理视频"
             )
-            
+
             # 下载阶段
             progress_service.update_progress(
                 project_id=project_id,
@@ -100,7 +100,7 @@ class VideoProcessingService:
                 message="下载视频文件",
                 sub_progress=100.0
             )
-            
+
             # 字幕生成阶段
             progress_service.update_progress(
                 project_id=project_id,
@@ -108,7 +108,7 @@ class VideoProcessingService:
                 message="生成字幕",
                 sub_progress=0.0
             )
-            
+
             # 模拟字幕生成过程
             for i in range(10):
                 await asyncio.sleep(1)  # 模拟处理时间
@@ -118,7 +118,7 @@ class VideoProcessingService:
                     message=f"字幕生成进度: {i*10}%",
                     sub_progress=i * 10.0
                 )
-            
+
             # 分析阶段
             progress_service.update_progress(
                 project_id=project_id,
@@ -126,15 +126,15 @@ class VideoProcessingService:
                 message="分析视频内容",
                 sub_progress=0.0
             )
-            
+
             # 继续其他阶段...
-            
+
             # 完成处理
             progress_service.complete_progress(
                 project_id=project_id,
                 message="视频处理完成"
             )
-            
+
         except Exception as e:
             # 标记失败
             progress_service.fail_progress(
@@ -144,7 +144,7 @@ class VideoProcessingService:
             raise
 ```
 
-### 3. 在API中使用
+### 3. 在 API 中使用
 
 ```python
 from fastapi import APIRouter, HTTPException
@@ -159,7 +159,7 @@ async def get_project_progress(project_id: str):
         progress_info = get_progress(project_id)
         if not progress_info:
             raise HTTPException(status_code=404, detail="项目进度不存在")
-        
+
         return {
             "project_id": project_id,
             "progress": progress_info.to_dict()
@@ -176,7 +176,7 @@ from backend.services.enhanced_progress_service import progress_service
 def progress_callback(progress_info):
     """进度回调函数"""
     print(f"项目 {progress_info.project_id} 进度更新: {progress_info.progress}%")
-    
+
     # 可以在这里添加其他逻辑，如：
     # - 发送通知
     # - 更新前端状态
@@ -207,23 +207,23 @@ class ProgressInfo:
 
 ### 进度计算规则
 
-- **INGEST阶段**: 0-10%
-- **SUBTITLE阶段**: 10-25%
-- **ANALYZE阶段**: 25-45%
-- **HIGHLIGHT阶段**: 45-70%
-- **EXPORT阶段**: 70-90%
-- **DONE阶段**: 100%
+- **INGEST 阶段**: 0-10%
+- **SUBTITLE 阶段**: 10-25%
+- **ANALYZE 阶段**: 25-45%
+- **HIGHLIGHT 阶段**: 45-70%
+- **EXPORT 阶段**: 70-90%
+- **DONE 阶段**: 100%
 
 每个阶段内部可以通过`sub_progress`参数(0-100)来细分进度。
 
 ## 🔧 配置和优化
 
-### 1. Redis配置
+### 1. Redis 配置
 
 ```python
 # 在backend/core/unified_config.py中配置
 redis:
-  url: "redis://localhost:6379/0"
+  url: "redis://redis:6379/0"
   max_connections: 10
   socket_timeout: 5
 ```
@@ -331,13 +331,13 @@ from backend.services.enhanced_progress_service import (
 
 def test_progress_tracking():
     project_id = "test_project"
-    
+
     # 开始进度
     progress = start_progress(project_id, initial_message="开始测试")
     assert progress.project_id == project_id
     assert progress.status == ProgressStatus.RUNNING
     assert progress.progress == 0
-    
+
     # 更新进度
     progress = update_progress(
         project_id=project_id,
@@ -347,7 +347,7 @@ def test_progress_tracking():
     )
     assert progress.stage == ProgressStage.SUBTITLE
     assert progress.progress > 0
-    
+
     # 完成进度
     progress = complete_progress(project_id, "测试完成")
     assert progress.status == ProgressStatus.COMPLETED
@@ -359,18 +359,18 @@ def test_progress_tracking():
 ```python
 async def test_progress_integration():
     project_id = "integration_test"
-    
+
     # 模拟完整的处理流程
     start_progress(project_id, "开始集成测试")
-    
-    for stage in [ProgressStage.INGEST, ProgressStage.SUBTITLE, 
-                  ProgressStage.ANALYZE, ProgressStage.HIGHLIGHT, 
+
+    for stage in [ProgressStage.INGEST, ProgressStage.SUBTITLE,
+                  ProgressStage.ANALYZE, ProgressStage.HIGHLIGHT,
                   ProgressStage.EXPORT]:
         update_progress(project_id, stage, f"测试{stage.value}阶段")
         await asyncio.sleep(0.1)  # 模拟处理时间
-    
+
     complete_progress(project_id, "集成测试完成")
-    
+
     # 验证最终状态
     final_progress = get_progress(project_id)
     assert final_progress.status == ProgressStatus.COMPLETED
@@ -425,7 +425,7 @@ progress_service.add_progress_callback(progress_log_callback)
 
 ## 🚨 常见问题
 
-### 1. Redis连接失败
+### 1. Redis 连接失败
 
 ```python
 # 系统会自动降级到内存缓存
@@ -456,4 +456,4 @@ for i, item in enumerate(items):
 
 - [错误处理指南](./ERROR_HANDLING_GUIDE.md)
 - [配置管理指南](./CONFIGURATION_GUIDE.md)
-- [API文档](./API_DOCUMENTATION.md)
+- [API 文档](./API_DOCUMENTATION.md)

@@ -13,13 +13,23 @@ i18n
     resources: {
       en: { translation: translationEN },
       zh: { translation: translationZH },
+      'zh-CN': { translation: translationZH },
       pt: { translation: translationPT },
+      'pt-BR': { translation: translationPT },
     },
     fallbackLng: 'en',
     interpolation: { escapeValue: false },
     detection: {
       order: ['querystring', 'cookie', 'localStorage', 'navigator', 'htmlTag'],
       caches: ['cookie'],
+      lookupQuerystring: 'lng',
+      lookupCookie: 'i18next',
+      lookupLocalStorage: 'i18nextLng',
+      convertDetectedLanguage: (lng) => {
+        if (lng.startsWith('pt')) return 'pt-BR';
+        if (lng.startsWith('zh')) return 'zh-CN';
+        return lng;
+      }
     },
     react: {
       useSuspense: false,

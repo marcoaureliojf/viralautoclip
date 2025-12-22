@@ -53,6 +53,7 @@ env/
 *.sqlite
 *.sqlite3
 data/autoclip.db
+data/settings.json
 
 # 项目数据目录（包含用户上传的视频和生成的文件）
 data/projects/
@@ -89,6 +90,7 @@ Thumbs.db
 
 # Redis数据文件
 dump.rdb
+docker-compose.yml
 
 # 临时文件
 *.tmp

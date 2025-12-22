@@ -55,11 +55,11 @@ def analyze_old_configs():
     # 检查backend/core/config.py中的默认值
     old_configs['config.py_defaults'] = {
         "database_url": "sqlite:///./data/autoclip.db",
-        "redis_url": "redis://localhost:6379/0",
+        "redis_url": "redis://redis:6379/0",
         "api_dashscope_api_key": "",
         "api_model_name": "qwen-plus",
-        "processing_chunk_size": 5000,
-        "processing_min_score_threshold": 0.7,
+        "processing_chunk_size": 1500,
+        "processing_min_score_threshold": 0.3,
         "log_level": "INFO"
     }
     

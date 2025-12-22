@@ -271,7 +271,7 @@ setup_environment() {
                 cat > .env << EOF
 # AutoClip 环境配置
 DATABASE_URL=sqlite:///./data/autoclip.db
-REDIS_URL=redis://localhost:6379/0
+REDIS_URL=redis://redis:6379/0
 API_DASHSCOPE_API_KEY=
 API_MODEL_NAME=qwen-plus
 LOG_LEVEL=INFO

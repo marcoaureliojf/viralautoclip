@@ -30,7 +30,7 @@ RUN if [ -f node_modules/.bin/vite ]; then chmod +x node_modules/.bin/vite; fi
 RUN npm run build
 
 # 第二阶段：构建后端
-FROM python:3.9-slim AS backend-builder
+FROM python:3.10-slim AS backend-builder
 
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1
@@ -54,7 +54,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 第三阶段：最终镜像
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1
@@ -69,6 +69,7 @@ RUN groupadd -g 1000 autoclip && \
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     curl \
+    git \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -76,7 +77,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # 从构建阶段复制文件
-COPY --from=backend-builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+COPY --from=backend-builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 COPY --from=backend-builder /usr/local/bin /usr/local/bin
 COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
 

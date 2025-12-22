@@ -39,8 +39,8 @@ def create_initial_data():
             project_type=ProjectType.KNOWLEDGE,
             status=ProjectStatus.PENDING,
             processing_config={
-                "chunk_size": 5000,
-                "min_score_threshold": 0.7,
+                "chunk_size": 1500,
+                "min_score_threshold": 0.3,
                 "max_clips_per_collection": 5
             }
         )

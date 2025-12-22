@@ -17,8 +17,8 @@ celery_app.conf.update(
     result_serializer='json',
     
     # Redis配置
-    broker_url='redis://localhost:6379/0',
-    result_backend='redis://localhost:6379/0',
+    broker_url='redis://redis:6379/0',
+    result_backend='redis://redis:6379/0',
     
     # 时区
     timezone='Asia/Shanghai',

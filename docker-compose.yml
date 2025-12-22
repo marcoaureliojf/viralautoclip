@@ -1,5 +1,5 @@
 services:
-  # Redis服务
+  # Redis服务 (Cache e Fila de Mensagens)
   redis:
     image: redis:7-alpine
     container_name: autoclip-redis
@@ -15,7 +15,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # 主应用服务
+  # 主应用服务 (Backend API & Frontend)
   autoclip:
     build:
       context: .
@@ -23,8 +23,8 @@ services:
     container_name: autoclip-app
     restart: unless-stopped
     ports:
-      - "8008:8000"  # 后端API & 前端 (Unified)
-      - "3008:8000"  # 前端界面 (通过8000端口服务)
+      - "8008:8000"
+      - "3008:8000"
     volumes:
       - ./data:/app/data:rw
       - ./logs:/app/logs:rw
@@ -35,6 +35,9 @@ services:
       - ENVIRONMENT=production
       - DEBUG=false
       - LOG_LEVEL=INFO
+      # Configurações LLM (Mapeadas conforme config.py)
+      - API_MODEL_NAME=llama-3.1-8b-instant
+      - API_TIMEOUT=60
     depends_on:
       redis:
         condition: service_healthy
@@ -45,7 +48,7 @@ services:
       retries: 3
       start_period: 40s
 
-  # Celery Worker服务
+  # Celery Worker服务 (Processamento Pesado: Whisper + LLM + FFmpeg)
   celery-worker:
     build:
       context: .
@@ -56,22 +59,34 @@ services:
       - ./data:/app/data:rw
       - ./logs:/app/logs:rw
       - ./uploads:/app/uploads:rw
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]  
     environment:
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=sqlite:///./data/autoclip.db
       - ENVIRONMENT=production
       - DEBUG=false
       - LOG_LEVEL=INFO
-    command: celery -A backend.core.celery_app worker --loglevel=info --concurrency=2
+      # Configurações LLM (Essenciais para o Worker não falhar)
+      - API_MODEL_NAME=llama-3.1-8b-instant
+      - API_TIMEOUT=60
+      - LLM_PROVIDER=groq
+      - SPEECH_RECOGNITION_METHOD=whisper_local
+      - WHISPER_MODEL=base
+      - PYTHONPATH=/app
+    command: celery -A backend.core.celery_app worker --loglevel=info --concurrency=2 -Q processing,video,notification,upload,celery
     depends_on:
       redis:
         condition: service_healthy
       autoclip:
         condition: service_healthy
-    healthcheck:
-      disable: true
 
-  # Celery Beat调度器
+  # Celery Beat调度器 (Tarefas Agendadas)
   celery-beat:
     build:
       context: .
@@ -85,18 +100,14 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=sqlite:///./data/autoclip.db
       - ENVIRONMENT=production
-      - DEBUG=false
-      - LOG_LEVEL=INFO
     command: celery -A backend.core.celery_app beat --loglevel=info
     depends_on:
       redis:
         condition: service_healthy
       autoclip:
         condition: service_healthy
-    healthcheck:
-      disable: true
 
-  # Flower监控服务（可选）
+  # Flower (Monitoramento do Celery)
   flower:
     build:
       context: .
@@ -115,12 +126,6 @@ services:
         condition: service_healthy
       celery-worker:
         condition: service_started
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5555/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
 volumes:
   redis_data:

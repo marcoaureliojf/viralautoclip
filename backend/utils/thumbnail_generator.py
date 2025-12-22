@@ -129,8 +129,7 @@ class ThumbnailGenerator:
                 'ffmpeg',
                 '-i', str(video_path),
                 '-an',  # 禁用音频
-                '-vcodec', 'copy',  # 复制视频流
-                '-f', 'image2',
+                # '-vcodec', 'copy',  # 不使用copy，因为某些编码可能无法直接转为jpg
                 '-vframes', '1',
                 '-y',
                 str(video_path.parent / f"{video_path.stem}_cover.jpg")
@@ -225,7 +224,7 @@ class ThumbnailGenerator:
         """
         try:
             # 生成临时缩略图
-            temp_path = video_path.parent / f"temp_thumbnail_{video_path.stem}.jpg"
+            temp_path = video_path.parent / f"temp_{video_path.stem}_thumb.jpg"
             thumbnail_path = self.generate_thumbnail(video_path, temp_path, time_offset, width, height)
             
             if thumbnail_path and thumbnail_path.exists():

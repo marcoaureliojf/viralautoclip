@@ -1,10 +1,10 @@
-# AutoClip - AI视频智能切片系统
+# AutoClip - AI 视频智能切片系统
 
 ![AutoClip Logo](https://img.shields.io/badge/AutoClip-AI%20Video%20Processing-blue?style=for-the-badge&logo=video)
 
-## 基于AI的智能视频切片处理系统
+## 基于 AI 的智能视频切片处理系统
 
-支持YouTube/B站视频下载、自动切片、智能合集生成
+支持 YouTube/B 站视频下载、自动切片、智能合集生成
 
 [![Python](https://img.shields.io/badge/Python-3.8+-green?style=flat&logo=python)](https://python.org)
 [![React](https://img.shields.io/badge/React-18+-blue?style=flat&logo=react)](https://reactjs.org)
@@ -24,23 +24,23 @@
 
 ## 🎯 项目简介
 
-AutoClip是一个基于AI的智能视频切片处理系统，能够自动从YouTube、B站等平台下载视频，通过AI分析提取精彩片段，并智能生成合集。系统采用现代化的前后端分离架构，提供直观的Web界面和强大的后端处理能力。
+AutoClip 是一个基于 AI 的智能视频切片处理系统，能够自动从 YouTube、B 站等平台下载视频，通过 AI 分析提取精彩片段，并智能生成合集。系统采用现代化的前后端分离架构，提供直观的 Web 界面和强大的后端处理能力。
 
 **联系方式**: [christine_zhouye@163.com](mailto:christine_zhouye@163.com)
 
 ### ✨ 核心特性
 
-- 🎬 **多平台支持**: YouTube、B站视频一键下载，支持本地文件上传
-- 🤖 **AI智能分析**: 基于通义千问大语言模型的视频内容理解
+- 🎬 **多平台支持**: YouTube、B 站视频一键下载，支持本地文件上传
+- 🤖 **AI 智能分析**: 基于通义千问大语言模型的视频内容理解
 - ✂️ **自动切片**: 智能识别精彩片段并自动切割，支持多种视频分类
-- 📚 **智能合集**: AI推荐和手动创建视频合集，支持拖拽排序
-- 🚀 **实时处理**: 异步任务队列，实时进度反馈，WebSocket通信
+- 📚 **智能合集**: AI 推荐和手动创建视频合集，支持拖拽排序
+- 🚀 **实时处理**: 异步任务队列，实时进度反馈，WebSocket 通信
 - 🎨 **现代界面**: React + TypeScript + Ant Design，响应式设计
 - 📱 **移动端支持**【开发中】: 响应式设计，正在完善移动端体验
-- 🔐 **账号管理**【开发中】: 支持B站多账号管理，自动健康检查
+- 🔐 **账号管理**【开发中】: 支持 B 站多账号管理，自动健康检查
 - 📊 **数据统计**: 完整的项目管理和数据统计功能
-- 🛠️ **易于部署**: 一键启动脚本，Docker支持，详细文档
-- 📤 **B站上传**【开发中】: 自动上传切片视频到B站
+- 🛠️ **易于部署**: 一键启动脚本，Docker 支持，详细文档
+- 📤 **B 站上传**【开发中】: 自动上传切片视频到 B 站
 - ✏️ **字幕编辑**【开发中】: 可视化字幕编辑和同步功能
 
 ## 🏗️ 系统架构
@@ -64,31 +64,31 @@ graph TB
 
 #### 后端技术
 
-- **FastAPI**: 现代化Python Web框架，自动API文档生成
+- **FastAPI**: 现代化 Python Web 框架，自动 API 文档生成
 - **Celery**: 分布式任务队列，支持异步处理
 - **Redis**: 消息代理和缓存，任务状态管理
-- **SQLite**: 轻量级数据库，支持升级到PostgreSQL
-- **yt-dlp**: YouTube视频下载，支持多种格式
-- **通义千问**: AI内容分析，支持多种模型
+- **SQLite**: 轻量级数据库，支持升级到 PostgreSQL
+- **yt-dlp**: YouTube 视频下载，支持多种格式
+- **通义千问**: AI 内容分析，支持多种模型
 - **WebSocket**: 实时通信，进度推送
 - **Pydantic**: 数据验证和序列化
 
 #### 前端技术
 
-- **React 18**: 用户界面框架，Hooks和函数组件
+- **React 18**: 用户界面框架，Hooks 和函数组件
 - **TypeScript**: 类型安全，更好的开发体验
-- **Ant Design**: 企业级UI组件库
+- **Ant Design**: 企业级 UI 组件库
 - **Vite**: 快速构建工具，热重载
 - **Zustand**: 轻量级状态管理
 - **React Router**: 路由管理
-- **Axios**: HTTP客户端
+- **Axios**: HTTP 客户端
 - **React Player**: 视频播放器
 
 ## 🚀 快速开始
 
 ### 环境要求
 
-#### Docker部署（推荐）
+#### Docker 部署（推荐）
 
 - **Docker**: 20.10+
 - **Docker Compose**: 2.0+
@@ -107,7 +107,7 @@ graph TB
 
 ### 一键启动
 
-#### 方式一：Docker部署（推荐）
+#### 方式一：Docker 部署（推荐）
 
 ```bash
 # 克隆项目
@@ -195,27 +195,32 @@ cp env.example .env
 ### 主要功能展示
 
 1. **视频下载与处理**
-   - 支持YouTube、B站视频链接解析
+
+   - 支持 YouTube、B 站视频链接解析
    - 自动下载视频和字幕文件
    - 支持本地文件上传
 
-2. **AI智能分析**
+2. **AI 智能分析**
+
    - 自动提取视频大纲
    - 智能识别话题时间点
    - 对片段进行精彩度评分
 
 3. **视频切片与合集**
+
    - 自动生成精彩片段
    - 智能推荐合集组合
    - 支持手动编辑和排序
 
 4. **实时进度监控**
-   - WebSocket实时进度推送
+
+   - WebSocket 实时进度推送
    - 详细的任务状态显示
    - 错误处理和重试机制
 
-5. **B站上传功能**【开发中】
-   - 自动上传切片视频到B站
+5. **B 站上传功能**【开发中】
+
+   - 自动上传切片视频到 B 站
    - 支持多账号管理
    - 批量上传和队列管理
 
@@ -228,19 +233,19 @@ cp env.example .env
 
 ### 1. 视频下载
 
-#### YouTube视频
+#### YouTube 视频
 
 1. 在首页点击"新建项目"
-2. 选择"YouTube链接"
-3. 粘贴视频URL
-4. 选择浏览器Cookie（可选）
+2. 选择"YouTube 链接"
+3. 粘贴视频 URL
+4. 选择浏览器 Cookie（可选）
 5. 点击"开始下载"
 
-#### B站视频
+#### B 站视频
 
 1. 在首页点击"新建项目"
-2. 选择"B站链接"
-3. 粘贴视频URL
+2. 选择"B 站链接"
+3. 粘贴视频 URL
 4. 选择登录账号
 5. 点击"开始下载"
 
@@ -257,20 +262,20 @@ cp env.example .env
 系统会自动执行以下步骤：
 
 1. **素材准备**: 下载视频和字幕文件
-2. **内容分析**: AI提取视频大纲和关键信息
+2. **内容分析**: AI 提取视频大纲和关键信息
 3. **时间线提取**: 识别话题时间区间
-4. **精彩评分**: 对每个片段进行AI评分
+4. **精彩评分**: 对每个片段进行 AI 评分
 5. **标题生成**: 为精彩片段生成吸引人标题
-6. **合集推荐**: AI推荐视频合集
+6. **合集推荐**: AI 推荐视频合集
 7. **视频生成**: 生成切片视频和合集视频
 
 ### 3. 结果管理
 
 - **查看切片**: 在项目详情页查看所有生成的视频片段
 - **编辑信息**: 修改片段标题、描述等信息
-- **创建合集**: 手动创建或使用AI推荐的合集
+- **创建合集**: 手动创建或使用 AI 推荐的合集
 - **下载导出**: 下载单个片段或完整合集
-- **B站上传**【开发中】: 一键上传切片视频到B站
+- **B 站上传**【开发中】: 一键上传切片视频到 B 站
 - **字幕编辑**【开发中】: 可视化编辑和同步字幕文件
 
 ## 🔧 配置说明
@@ -284,7 +289,7 @@ cp env.example .env
 DATABASE_URL=sqlite:///./data/autoclip.db
 
 # Redis配置
-REDIS_URL=redis://localhost:6379/0
+REDIS_URL=redis://redis:6379/0
 
 # AI API配置
 API_DASHSCOPE_API_KEY=your_dashscope_api_key
@@ -300,11 +305,11 @@ UPLOAD_DIR=./data/uploads
 PROJECT_DIR=./data/projects
 ```
 
-### B站账号配置【开发中】
+### B 站账号配置【开发中】
 
-1. 在设置页面点击"B站账号管理"
+1. 在设置页面点击"B 站账号管理"
 2. 选择登录方式：
-   - **Cookie导入**（推荐）：从浏览器导出Cookie
+   - **Cookie 导入**（推荐）：从浏览器导出 Cookie
    - **账号密码**：直接输入账号密码
    - **二维码登录**：扫描二维码登录
 3. 添加成功后系统会自动管理账号健康状态
@@ -389,25 +394,25 @@ autoclip/
 └── *.sh                   # 启动脚本
 ```
 
-## 🌐 API文档
+## 🌐 API 文档
 
-启动系统后访问以下地址查看API文档：
+启动系统后访问以下地址查看 API 文档：
 
 - **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs) (本地开发环境)
 - **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc) (本地开发环境)
 
-### 主要API端点
+### 主要 API 端点
 
-| 端点 | 方法 | 描述 |
-|------|------|------|
-| `/api/v1/projects` | GET | 获取项目列表 |
-| `/api/v1/projects` | POST | 创建新项目 |
-| `/api/v1/projects/{id}` | GET | 获取项目详情 |
-| `/api/v1/youtube/parse` | POST | 解析YouTube视频信息 |
-| `/api/v1/youtube/download` | POST | 下载YouTube视频 |
-| `/api/v1/bilibili/download` | POST | 下载B站视频 |
-| `/api/v1/projects/{id}/process` | POST | 开始处理项目 |
-| `/api/v1/projects/{id}/status` | GET | 获取处理状态 |
+| 端点                            | 方法 | 描述                  |
+| ------------------------------- | ---- | --------------------- |
+| `/api/v1/projects`              | GET  | 获取项目列表          |
+| `/api/v1/projects`              | POST | 创建新项目            |
+| `/api/v1/projects/{id}`         | GET  | 获取项目详情          |
+| `/api/v1/youtube/parse`         | POST | 解析 YouTube 视频信息 |
+| `/api/v1/youtube/download`      | POST | 下载 YouTube 视频     |
+| `/api/v1/bilibili/download`     | POST | 下载 B 站视频         |
+| `/api/v1/projects/{id}/process` | POST | 开始处理项目          |
+| `/api/v1/projects/{id}/status`  | GET  | 获取处理状态          |
 
 ## 🔍 故障排除
 
@@ -424,7 +429,7 @@ lsof -i :3000  # 前端端口
 kill -9 <PID>
 ```
 
-#### 2. Redis连接失败
+#### 2. Redis 连接失败
 
 ```bash
 # 检查Redis状态
@@ -435,17 +440,17 @@ brew services start redis  # macOS
 systemctl start redis      # Linux
 ```
 
-#### 3. YouTube下载失败
+#### 3. YouTube 下载失败
 
 - 检查网络连接
-- 更新yt-dlp版本：`pip install --upgrade yt-dlp`
-- 尝试使用浏览器Cookie
+- 更新 yt-dlp 版本：`pip install --upgrade yt-dlp`
+- 尝试使用浏览器 Cookie
 - 检查视频是否可用
 
-#### 4. B站下载失败
+#### 4. B 站下载失败
 
 - 检查账号登录状态
-- 更新账号Cookie
+- 更新账号 Cookie
 - 检查视频权限设置
 
 ### 日志查看
@@ -515,16 +520,18 @@ celery -A backend.core.celery_app flower --port=5555
 ### 生产环境配置
 
 1. **数据库优化**
-   - 使用PostgreSQL替代SQLite
+
+   - 使用 PostgreSQL 替代 SQLite
    - 配置连接池
    - 启用查询缓存
 
-2. **Redis优化**
+2. **Redis 优化**
+
    - 配置内存限制
    - 启用持久化
    - 设置过期策略
 
-3. **Celery优化**
+3. **Celery 优化**
    - 调整并发数
    - 配置任务路由
    - 启用结果后端
@@ -534,14 +541,16 @@ celery -A backend.core.celery_app flower --port=5555
 ### 生产环境安全
 
 1. **环境变量**
+
    - 使用强密码
    - 定期轮换密钥
-   - 限制API访问
+   - 限制 API 访问
 
 2. **网络安全**
+
    - 配置防火墙
-   - 使用HTTPS
-   - 限制CORS
+   - 使用 HTTPS
+   - 限制 CORS
 
 3. **数据安全**
    - 定期备份
@@ -550,7 +559,7 @@ celery -A backend.core.celery_app flower --port=5555
 
 ## 🚀 部署指南
 
-### Docker部署
+### Docker 部署
 
 #### 快速启动
 
@@ -573,9 +582,9 @@ docker-compose ps
 #### 访问服务
 
 - **前端界面**: [http://localhost:3000](http://localhost:3000) (本地开发环境)
-- **后端API**: [http://localhost:8000](http://localhost:8000) (本地开发环境)
-- **API文档**: [http://localhost:8000/docs](http://localhost:8000/docs) (本地开发环境)
-- **Flower监控**: [http://localhost:5555](http://localhost:5555) (本地开发环境)
+- **后端 API**: [http://localhost:8000](http://localhost:8000) (本地开发环境)
+- **API 文档**: [http://localhost:8000/docs](http://localhost:8000/docs) (本地开发环境)
+- **Flower 监控**: [http://localhost:5555](http://localhost:5555) (本地开发环境)
 
 #### 开发环境
 
@@ -589,7 +598,7 @@ docker-compose -f docker-compose.dev.yml logs -f
 
 #### 详细说明
 
-完整的Docker部署指南请参考 [DOCKER.md](DOCKER.md) 文档。
+完整的 Docker 部署指南请参考 [DOCKER.md](DOCKER.md) 文档。
 
 ### 系统服务
 
@@ -617,17 +626,17 @@ WantedBy=multi-user.target
 
 ### 即将推出
 
-- [ ] **B站上传功能**: 自动上传切片视频到B站，支持多账号管理
+- [ ] **B 站上传功能**: 自动上传切片视频到 B 站，支持多账号管理
 - [ ] **字幕编辑功能**: 可视化字幕编辑器和同步功能
 - [ ] **多语言支持**: 支持更多语言的视频处理
 - [ ] **云端存储**: 集成云存储服务
 - [ ] **批量处理**: 支持批量视频处理
-- [ ] **API开放**: 提供公开API接口
+- [ ] **API 开放**: 提供公开 API 接口
 - [ ] **移动应用**: 开发移动端应用
 
 ### 长期规划
 
-- [ ] **AI模型优化**: 集成更多AI模型
+- [ ] **AI 模型优化**: 集成更多 AI 模型
 - [ ] **实时协作**: 支持多用户协作
 - [ ] **插件系统**: 支持第三方插件
 - [ ] **企业版**: 企业级功能和服务
@@ -638,8 +647,8 @@ WantedBy=multi-user.target
 
 ### 如何贡献
 
-1. **Fork** 项目到您的GitHub账户
-2. 克隆您的Fork到本地：
+1. **Fork** 项目到您的 GitHub 账户
+2. 克隆您的 Fork 到本地：
 
    ```bash
    git clone https://github.com/zhouxiaoka/autoclip.git
@@ -666,14 +675,14 @@ WantedBy=multi-user.target
    git push origin feature/amazing-feature
    ```
 
-7. 在GitHub上创建 **Pull Request**
+7. 在 GitHub 上创建 **Pull Request**
 
 ### 开发规范
 
 #### 代码规范
 
-- 后端：遵循PEP 8 Python代码规范
-- 前端：使用TypeScript，遵循ESLint规则
+- 后端：遵循 PEP 8 Python 代码规范
+- 前端：使用 TypeScript，遵循 ESLint 规则
 - 提交信息：使用约定式提交格式（feat, fix, docs, style, refactor, test, chore）
 
 #### 开发流程
@@ -719,8 +728,8 @@ lsof -i :3000  # 前端端口
 kill -9 <PID>
 ```
 
-**Q: Redis连接失败怎么办？**
-A: 确保Redis服务正在运行：
+**Q: Redis 连接失败怎么办？**
+A: 确保 Redis 服务正在运行：
 
 ```bash
 # 检查Redis状态
@@ -743,34 +752,34 @@ npm install
 
 ### 功能使用问题
 
-**Q: YouTube视频下载失败怎么办？**
+**Q: YouTube 视频下载失败怎么办？**
 A:
 
 1. 检查网络连接
-2. 更新yt-dlp：`pip install --upgrade yt-dlp`
-3. 尝试使用浏览器Cookie
+2. 更新 yt-dlp：`pip install --upgrade yt-dlp`
+3. 尝试使用浏览器 Cookie
 4. 检查视频是否可用或需要登录
 
-**Q: B站视频下载失败怎么办？**
+**Q: B 站视频下载失败怎么办？**
 A:
 
 1. 检查账号登录状态
-2. 更新账号Cookie
+2. 更新账号 Cookie
 3. 检查视频权限设置
 4. 尝试使用其他账号
 
-**Q: AI处理速度慢怎么办？**
+**Q: AI 处理速度慢怎么办？**
 A:
 
-1. 检查API密钥配置
-2. 调整处理参数（减少chunk_size）
+1. 检查 API 密钥配置
+2. 调整处理参数（减少 chunk_size）
 3. 检查网络连接
-4. 考虑使用更快的AI模型
+4. 考虑使用更快的 AI 模型
 
-**Q: B站上传功能什么时候可以使用？**
-A: B站上传功能正在开发中，预计在下一个版本中发布。该功能将支持：
+**Q: B 站上传功能什么时候可以使用？**
+A: B 站上传功能正在开发中，预计在下一个版本中发布。该功能将支持：
 
-- 自动上传切片视频到B站
+- 自动上传切片视频到 B 站
 - 多账号管理和切换
 - 批量上传和队列管理
 - 上传进度监控
@@ -788,8 +797,8 @@ A: 字幕编辑功能正在开发中，预计在下一个版本中发布。该�
 **Q: 如何提高处理速度？**
 A:
 
-1. 增加Celery Worker并发数
-2. 使用SSD存储
+1. 增加 Celery Worker 并发数
+2. 使用 SSD 存储
 3. 增加系统内存
 4. 优化视频质量设置
 
@@ -808,7 +817,7 @@ A:
 - **问题反馈**: [GitHub Issues](https://github.com/zhouxiaoka/autoclip/issues)
 - **功能建议**: [GitHub Discussions](https://github.com/zhouxiaoka/autoclip/discussions)
   (仓库创建后可用)
-- **Bug报告**: 请使用GitHub Issues模板
+- **Bug 报告**: 请使用 GitHub Issues 模板
 - **文档**: [项目文档](docs/)
 
 ### 联系方式
@@ -827,7 +836,7 @@ A:
 
 - 提交 [GitHub Issue](https://github.com/zhouxiaoka/autoclip/issues)
 - 发送邮件至：[christine_zhouye@163.com](mailto:christine_zhouye@163.com)
-- 添加上述QQ或飞书联系
+- 添加上述 QQ 或飞书联系
 
 ## 🙏 致谢
 
@@ -835,22 +844,22 @@ A:
 
 ### 核心技术栈
 
-- [FastAPI](https://fastapi.tiangolo.com/) - 现代化Python Web框架
+- [FastAPI](https://fastapi.tiangolo.com/) - 现代化 Python Web 框架
 - [React](https://reactjs.org/) - 用户界面库
-- [Ant Design](https://ant.design/) - 企业级UI设计语言
-- [TypeScript](https://typescriptlang.org/) - JavaScript的超集
+- [Ant Design](https://ant.design/) - 企业级 UI 设计语言
+- [TypeScript](https://typescriptlang.org/) - JavaScript 的超集
 - [Celery](https://docs.celeryproject.org/) - 分布式任务队列
 - [Redis](https://redis.io/) - 内存数据结构存储
 
 ### 视频处理
 
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) - YouTube视频下载工具
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) - YouTube 视频下载工具
 - [FFmpeg](https://ffmpeg.org/) - 音视频处理框架
 
-### AI服务
+### AI 服务
 
 - [通义千问](https://tongyi.aliyun.com/) - 阿里云大语言模型服务
-- [DashScope](https://dashscope.aliyun.com/) - 阿里云AI服务平台
+- [DashScope](https://dashscope.aliyun.com/) - 阿里云 AI 服务平台
 
 ### 开发工具
 
@@ -872,4 +881,4 @@ A:
 
 Made with ❤️ by AutoClip Team
 
-⭐ 如果觉得有用，请给个Star支持一下！
+⭐ 如果觉得有用，请给个 Star 支持一下！

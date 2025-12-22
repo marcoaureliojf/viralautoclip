@@ -2,7 +2,7 @@
 
 ## 📋 概述
 
-AutoClip 是一个基于AI的视频切片处理系统，采用前后端分离架构。本指南将帮助您快速启动和运行整个系统。
+AutoClip 是一个基于 AI 的视频切片处理系统，采用前后端分离架构。本指南将帮助您快速启动和运行整个系统。
 
 ## 🚀 快速开始
 
@@ -29,12 +29,14 @@ AutoClip 是一个基于AI的视频切片处理系统，采用前后端分离架
 ## 📊 系统架构
 
 ### 后端服务
+
 - **FastAPI**: RESTful API 和 WebSocket 支持
 - **Celery**: 异步任务队列
 - **Redis**: 消息代理和缓存
 - **SQLite**: 数据存储
 
 ### 前端服务
+
 - **React**: 用户界面
 - **Vite**: 开发服务器
 - **TypeScript**: 类型安全
@@ -42,6 +44,7 @@ AutoClip 是一个基于AI的视频切片处理系统，采用前后端分离架
 ## 🔧 环境要求
 
 ### 系统要求
+
 - macOS 或 Linux
 - Python 3.8+
 - Node.js 16+
@@ -80,7 +83,7 @@ cp env.example .env
 DATABASE_URL=sqlite:///./data/autoclip.db
 
 # Redis配置
-REDIS_URL=redis://localhost:6379/0
+REDIS_URL=redis://redis:6379/0
 
 # API配置
 API_DASHSCOPE_API_KEY=your_api_key_here
@@ -94,12 +97,12 @@ DEBUG=true
 
 ## 🌐 服务端口
 
-| 服务 | 端口 | 描述 |
-|------|------|------|
-| 前端界面 | 3000 | React 开发服务器 |
-| 后端API | 8000 | FastAPI 服务器 |
-| Redis | 6379 | 消息代理 |
-| API文档 | 8000/docs | Swagger UI |
+| 服务     | 端口      | 描述             |
+| -------- | --------- | ---------------- |
+| 前端界面 | 3000      | React 开发服务器 |
+| 后端 API | 8000      | FastAPI 服务器   |
+| Redis    | 6379      | 消息代理         |
+| API 文档 | 8000/docs | Swagger UI       |
 
 ## 📁 目录结构
 
@@ -127,26 +130,29 @@ autoclip/
 ### 常见问题
 
 1. **端口被占用**
+
    ```bash
    # 检查端口占用
    lsof -i :8000
    lsof -i :3000
-   
+
    # 停止占用进程
    kill -9 <PID>
    ```
 
-2. **Redis连接失败**
+2. **Redis 连接失败**
+
    ```bash
    # 检查Redis状态
    redis-cli ping
-   
+
    # 启动Redis
    brew services start redis  # macOS
    systemctl start redis      # Linux
    ```
 
-3. **Python依赖问题**
+3. **Python 依赖问题**
+
    ```bash
    # 重新安装依赖
    pip install -r requirements.txt --force-reinstall
@@ -227,16 +233,18 @@ celery -A backend.core.celery_app flower --port=5555
 ### 生产环境配置
 
 1. **数据库优化**
-   - 使用PostgreSQL替代SQLite
+
+   - 使用 PostgreSQL 替代 SQLite
    - 配置连接池
    - 启用查询缓存
 
-2. **Redis优化**
+2. **Redis 优化**
+
    - 配置内存限制
    - 启用持久化
    - 设置过期策略
 
-3. **Celery优化**
+3. **Celery 优化**
    - 调整并发数
    - 配置任务路由
    - 启用结果后端
@@ -246,14 +254,16 @@ celery -A backend.core.celery_app flower --port=5555
 ### 生产环境安全
 
 1. **环境变量**
+
    - 使用强密码
    - 定期轮换密钥
-   - 限制API访问
+   - 限制 API 访问
 
 2. **网络安全**
+
    - 配置防火墙
-   - 使用HTTPS
-   - 限制CORS
+   - 使用 HTTPS
+   - 限制 CORS
 
 3. **数据安全**
    - 定期备份

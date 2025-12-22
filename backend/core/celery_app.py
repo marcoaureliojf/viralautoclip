@@ -26,8 +26,8 @@ class CeleryConfig:
     enable_utc = True
     
     # Redis配置
-    broker_url = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
-    result_backend = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+    broker_url = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+    result_backend = os.getenv('REDIS_URL', 'redis://redis:6379/0')
     
     # 任务配置
     task_always_eager = os.getenv('CELERY_ALWAYS_EAGER', 'False').lower() == 'true'  # 生产环境异步执行

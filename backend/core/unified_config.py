@@ -1,6 +1,6 @@
 """
-统一配置管理系统
-整合所有配置源，提供统一的配置访问接口
+Unified configuration management system
+Integrates all configuration sources, providing a unified configuration access interface
 """
 
 import json
@@ -15,27 +15,27 @@ logger = logging.getLogger(__name__)
 
 
 class DatabaseConfig(BaseModel):
-    """数据库配置"""
-    url: str = Field(default="sqlite:///./data/autoclip.db", description="数据库连接URL")
+    """Database configuration"""
+    url: str = Field(default="sqlite:///./data/autoclip.db", description="Database connection URL")
     echo: bool = Field(default=False, description="是否打印SQL语句")
     pool_size: int = Field(default=5, description="连接池大小")
     max_overflow: int = Field(default=10, description="最大溢出连接数")
 
 
 class RedisConfig(BaseModel):
-    """Redis配置"""
-    url: str = Field(default="redis://localhost:6379/0", description="Redis连接URL")
-    max_connections: int = Field(default=10, description="最大连接数")
-    socket_timeout: int = Field(default=5, description="Socket超时时间")
+    """Redis configuration"""
+    url: str = Field(default="redis://redis:6379/0", description="Redis connection URL")
+    max_connections: int = Field(default=10, description="Maximum number of connections")
+    socket_timeout: int = Field(default=5, description="Socket timeout")
 
 
 class APIConfig(BaseModel):
-    """API配置"""
-    dashscope_api_key: str = Field(default="", description="DashScope API密钥")
-    model_name: str = Field(default="qwen-plus", description="模型名称")
-    max_tokens: int = Field(default=4096, description="最大token数")
-    timeout: int = Field(default=30, description="API超时时间")
-    max_retries: int = Field(default=3, description="最大重试次数")
+    """API configuration"""
+    dashscope_api_key: str = Field(default="", description="DashScope API key")
+    model_name: str = Field(default="qwen-plus", description="Model name")
+    max_tokens: int = Field(default=4096, description="Maximum token count")
+    timeout: int = Field(default=30, description="API timeout")
+    max_retries: int = Field(default=3, description="Maximum retry count")
     
     @validator('max_tokens')
     def validate_max_tokens(cls, v):
@@ -46,17 +46,17 @@ class APIConfig(BaseModel):
     @validator('timeout')
     def validate_timeout(cls, v):
         if v <= 0:
-            raise ValueError('timeout必须大于0')
+            raise ValueError('timeout must be greater than 0')
         return v
 
 
 class ProcessingConfig(BaseModel):
-    """处理配置"""
-    chunk_size: int = Field(default=5000, description="文本分块大小")
-    min_score_threshold: float = Field(default=0.7, description="最小评分阈值")
-    max_clips_per_collection: int = Field(default=5, description="每个合集最大切片数")
-    max_retries: int = Field(default=3, description="最大重试次数")
-    timeout_seconds: int = Field(default=30, description="处理超时时间")
+    """Processing configuration"""
+    chunk_size: int = Field(default=500, description="Text chunk size")
+    min_score_threshold: float = Field(default=0.3, description="Minimum score threshold")
+    max_clips_per_collection: int = Field(default=5, description="Maximum number of clips per collection")
+    max_retries: int = Field(default=3, description="Maximum retry count")
+    timeout_seconds: int = Field(default=30, description="Processing timeout")
     
     # 话题提取控制参数
     min_topic_duration_minutes: int = Field(default=2, description="最小话题时长(分钟)")
@@ -79,15 +79,15 @@ class ProcessingConfig(BaseModel):
 
 
 class SpeechRecognitionConfig(BaseModel):
-    """语音识别配置"""
-    method: str = Field(default="whisper_local", description="识别方法")
-    language: str = Field(default="auto", description="识别语言")
-    model: str = Field(default="base", description="模型大小")
-    timeout: int = Field(default=1000, description="识别超时时间")
+    """Speech recognition configuration"""
+    method: str = Field(default="whisper_local", description="Recognition method")
+    language: str = Field(default="auto", description="Recognition language")
+    model: str = Field(default="base", description="Model size")
+    timeout: int = Field(default=1000, description="Recognition timeout")
 
 
 class BilibiliConfig(BaseModel):
-    """B站配置"""
+    """Bilibili configuration"""
     auto_upload: bool = Field(default=False, description="是否自动上传")
     default_tid: int = Field(default=21, description="默认分区ID")
     max_concurrent_uploads: int = Field(default=3, description="最大并发上传数")
@@ -97,7 +97,7 @@ class BilibiliConfig(BaseModel):
 
 
 class LoggingConfig(BaseModel):
-    """日志配置"""
+    """Logging configuration"""
     level: str = Field(default="INFO", description="日志级别")
     format: str = Field(default="%(asctime)s - %(name)s - %(levelname)s - %(message)s", description="日志格式")
     file: str = Field(default="backend.log", description="日志文件")
@@ -106,7 +106,7 @@ class LoggingConfig(BaseModel):
 
 
 class PathConfig(BaseModel):
-    """路径配置"""
+    """Path configuration"""
     project_root: Path = Field(default_factory=lambda: Path(__file__).parent.parent.parent)
     data_dir: Path = Field(default_factory=lambda: Path(__file__).parent.parent.parent / "data")
     uploads_dir: Path = Field(default_factory=lambda: Path(__file__).parent.parent.parent / "data" / "uploads")
@@ -123,7 +123,7 @@ class PathConfig(BaseModel):
 
 
 class UnifiedConfig(BaseSettings):
-    """统一配置类"""
+    """Unified configuration class"""
     
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -132,12 +132,12 @@ class UnifiedConfig(BaseSettings):
         env_nested_delimiter='__'
     )
     
-    # 环境配置
+    # Environment configuration
     environment: str = Field(default="development", description="运行环境")
     debug: bool = Field(default=True, description="调试模式")
     encryption_key: str = Field(default="", description="加密密钥")
     
-    # 子配置
+    # Sub configurations
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
     redis: RedisConfig = Field(default_factory=RedisConfig)
     api: APIConfig = Field(default_factory=APIConfig)
@@ -153,8 +153,8 @@ class UnifiedConfig(BaseSettings):
         self._setup_environment()
     
     def _load_from_files(self):
-        """从配置文件加载设置"""
-        # 从data/settings.json加载
+        """Load settings from files"""
+        # Load from data/settings.json
         settings_file = self.paths.data_dir / "settings.json"
         if settings_file.exists():
             try:
@@ -164,11 +164,11 @@ class UnifiedConfig(BaseSettings):
             except Exception as e:
                 logger.warning(f"加载配置文件失败: {e}")
         
-        # 从环境变量加载
+        # Load from environment variables
         self._load_from_env()
     
     def _merge_settings(self, settings: Dict[str, Any]):
-        """合并设置到配置对象"""
+        """Merge settings into configuration object"""
         for key, value in settings.items():
             if hasattr(self, key):
                 if isinstance(getattr(self, key), BaseModel):
@@ -182,47 +182,47 @@ class UnifiedConfig(BaseSettings):
                     setattr(self, key, value)
     
     def _load_from_env(self):
-        """从环境变量加载配置"""
-        # 数据库配置
+        """Load settings from environment variables"""
+        # Database configuration
         if os.getenv("DATABASE_URL"):
             self.database.url = os.getenv("DATABASE_URL")
         
-        # Redis配置
+        # Redis configuration
         if os.getenv("REDIS_URL"):
             self.redis.url = os.getenv("REDIS_URL")
         
-        # API配置
+        # API configuration
         if os.getenv("DASHSCOPE_API_KEY"):
             self.api.dashscope_api_key = os.getenv("DASHSCOPE_API_KEY")
         if os.getenv("API_MODEL_NAME"):
             self.api.model_name = os.getenv("API_MODEL_NAME")
         
-        # 处理配置
+        # Processing configuration
         if os.getenv("PROCESSING_CHUNK_SIZE"):
             self.processing.chunk_size = int(os.getenv("PROCESSING_CHUNK_SIZE"))
         if os.getenv("PROCESSING_MIN_SCORE_THRESHOLD"):
             self.processing.min_score_threshold = float(os.getenv("PROCESSING_MIN_SCORE_THRESHOLD"))
         
-        # 日志配置
+        # Logging configuration
         if os.getenv("LOG_LEVEL"):
             self.logging.level = os.getenv("LOG_LEVEL")
         if os.getenv("LOG_FILE"):
             self.logging.file = os.getenv("LOG_FILE")
     
     def _setup_environment(self):
-        """设置环境变量"""
-        # 设置API密钥到环境变量
+        """ Set environment variables"""
+        # Set API key to environment variable
         if self.api.dashscope_api_key:
             os.environ["DASHSCOPE_API_KEY"] = self.api.dashscope_api_key
         
-        # 设置数据库URL
+        # Set database URL
         os.environ["DATABASE_URL"] = self.database.url
         
-        # 设置Redis URL
+        #   Set Redis URL
         os.environ["REDIS_URL"] = self.redis.url
     
     def save_to_file(self, file_path: Optional[Path] = None):
-        """保存配置到文件"""
+        """Save configuration to file"""
         if file_path is None:
             file_path = self.paths.data_dir / "settings.json"
         

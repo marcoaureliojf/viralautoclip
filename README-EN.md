@@ -207,26 +207,31 @@ cp env.example .env
 ### Main Feature Showcase
 
 1. **Video Download and Processing**
+
    - Support for YouTube, Bilibili video link parsing
    - Automatic video and subtitle file download
    - Support for local file upload
 
 2. **AI Intelligent Analysis**
+
    - Automatic video outline extraction
    - Intelligent topic timeline identification
    - Exciting clip scoring
 
 3. **Video Clipping and Collections**
+
    - Automatic exciting clip generation
    - Smart collection recommendations
    - Support for manual editing and sorting
 
 4. **Real-time Progress Monitoring**
+
    - WebSocket real-time progress push
    - Detailed task status display
    - Error handling and retry mechanisms
 
 5. **Bilibili Upload Feature** **[In Development]**
+
    - Automatic upload of clipped videos to Bilibili
    - Support for multiple account management
    - Batch upload and queue management
@@ -298,7 +303,7 @@ Create `.env` file:
 DATABASE_URL=sqlite:///./data/autoclip.db
 
 # Redis configuration
-REDIS_URL=redis://localhost:6379/0
+REDIS_URL=redis://redis:6379/0
 
 # AI API configuration
 API_DASHSCOPE_API_KEY=your_dashscope_api_key
@@ -322,7 +327,7 @@ PROJECT_DIR=./data/projects
    - **Account Password**: Directly input account and password
    - **QR Code Login**: Scan QR code to login
 3. After successful addition, the system will automatically manage account health
-  status
+   status
 
 ## 📁 Project Structure
 
@@ -410,16 +415,16 @@ After starting the system, visit the following addresses to view API documentati
 
 ### Main API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/projects` | GET | Get project list |
-| `/api/v1/projects` | POST | Create new project |
-| `/api/v1/projects/{id}` | GET | Get project details |
-| `/api/v1/youtube/parse` | POST | Parse YouTube video information |
-| `/api/v1/youtube/download` | POST | Download YouTube video |
-| `/api/v1/bilibili/download` | POST | Download Bilibili video |
-| `/api/v1/projects/{id}/process` | POST | Start project processing |
-| `/api/v1/projects/{id}/status` | GET | Get processing status |
+| Endpoint                        | Method | Description                     |
+| ------------------------------- | ------ | ------------------------------- |
+| `/api/v1/projects`              | GET    | Get project list                |
+| `/api/v1/projects`              | POST   | Create new project              |
+| `/api/v1/projects/{id}`         | GET    | Get project details             |
+| `/api/v1/youtube/parse`         | POST   | Parse YouTube video information |
+| `/api/v1/youtube/download`      | POST   | Download YouTube video          |
+| `/api/v1/bilibili/download`     | POST   | Download Bilibili video         |
+| `/api/v1/projects/{id}/process` | POST   | Start project processing        |
+| `/api/v1/projects/{id}/status`  | GET    | Get processing status           |
 
 ## 🔍 Troubleshooting
 
@@ -527,11 +532,13 @@ celery -A backend.core.celery_app flower --port=5555
 ### Production Environment Configuration
 
 1. **Database Optimization**
+
    - Use PostgreSQL instead of SQLite
    - Configure connection pooling
    - Enable query caching
 
 2. **Redis Optimization**
+
    - Configure memory limits
    - Enable persistence
    - Set expiration policies
@@ -546,11 +553,13 @@ celery -A backend.core.celery_app flower --port=5555
 ### Production Environment Security
 
 1. **Environment Variables**
+
    - Use strong passwords
    - Regularly rotate keys
    - Limit API access
 
 2. **Network Security**
+
    - Configure firewall
    - Use HTTPS
    - Limit CORS
@@ -630,7 +639,7 @@ WantedBy=multi-user.target
 ### Coming Soon
 
 - [ ] **Bilibili Upload Feature**: Automatic upload of clipped videos to Bilibili
-  with multi-account management
+      with multi-account management
 - [ ] **Subtitle Editing Feature**: Visual subtitle editor and synchronization functionality
 - [ ] **Multi-language Support**: Support for more language video processing
 - [ ] **Cloud Storage**: Integrate cloud storage services

@@ -187,8 +187,8 @@ const SettingsPage: React.FC = () => {
                 initialValues={{
                   llm_provider: 'dashscope',
                   model_name: 'qwen-plus',
-                  chunk_size: 5000,
-                  min_score_threshold: 0.7,
+                  chunk_size: 1500,
+                  min_score_threshold: 0.3,
                   max_clips_per_collection: 5
                 }}
               >
@@ -306,7 +306,7 @@ const SettingsPage: React.FC = () => {
                     >
                       <Input 
                         type="number" 
-                        placeholder="5000" 
+                        placeholder="1500" 
                         addonAfter={t('settings.form.chunk_size_unit')} 
                         className="settings-input"
                       />
@@ -326,7 +326,7 @@ const SettingsPage: React.FC = () => {
                         step="0.1" 
                         min="0" 
                         max="1" 
-                        placeholder="0.7" 
+                        placeholder="0.3" 
                         className="settings-input"
                       />
                     </Form.Item>

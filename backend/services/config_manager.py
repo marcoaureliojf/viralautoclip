@@ -40,8 +40,8 @@ class LLMConfig:
 @dataclass
 class ProcessingParams:
     """处理参数"""
-    chunk_size: int = 5000
-    min_score_threshold: float = 0.7
+    chunk_size: int = 1500
+    min_score_threshold: float = 0.3
     max_clips_per_collection: int = 5
     min_topic_duration_minutes: int = 2
     max_topic_duration_minutes: int = 12
@@ -185,8 +185,8 @@ class ProjectConfigManager:
         """获取处理参数"""
         params = self.config.get("processing_params", {})
         return ProcessingParams(
-            chunk_size=params.get("chunk_size", 5000),
-            min_score_threshold=params.get("min_score_threshold", 0.7),
+            chunk_size=params.get("chunk_size", 1500),
+            min_score_threshold=params.get("min_score_threshold", 0.3),
             max_clips_per_collection=params.get("max_clips_per_collection", 5),
             min_topic_duration_minutes=params.get("min_topic_duration_minutes", 2),
             max_topic_duration_minutes=params.get("max_topic_duration_minutes", 12),

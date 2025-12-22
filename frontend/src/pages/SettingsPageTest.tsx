@@ -31,8 +31,8 @@ const SettingsPageTest: React.FC = () => {
             className="settings-form"
             initialValues={{
               model_name: 'qwen-plus',
-              chunk_size: 5000,
-              min_score_threshold: 0.7,
+              chunk_size: 1500,
+              min_score_threshold: 0.3,
               max_clips_per_collection: 5
             }}
           >
@@ -84,7 +84,7 @@ const SettingsPageTest: React.FC = () => {
                 >
                   <Input 
                     type="number" 
-                    placeholder="5000" 
+                    placeholder="1500" 
                     addonAfter="字符" 
                     className="settings-input"
                   />
@@ -104,7 +104,7 @@ const SettingsPageTest: React.FC = () => {
                     step="0.1" 
                     min="0" 
                     max="1" 
-                    placeholder="0.7" 
+                    placeholder="0.3" 
                     className="settings-input"
                   />
                 </Form.Item>
