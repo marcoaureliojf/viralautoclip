@@ -41,12 +41,13 @@ class OutlineExtractor:
         self.srt_chunks_dir = self.metadata_dir / "step1_srt_chunks"
         self.srt_chunks_dir.mkdir(parents=True, exist_ok=True)
 
-    def extract_outline(self, srt_path: Path) -> List[Dict]:
+    def extract_outline(self, srt_path: Path, language: Optional[str] = None) -> List[Dict]:
         """
         Extract video outline from SRT file
         
         Args:
             srt_path: Path to the SRT file
+            language: Desired output language
             
         Returns:
             List of video outlines
@@ -83,7 +84,7 @@ class OutlineExtractor:
                 
                 # Call LLM for each chunk
                 input_data = {"text": chunk_text}
-                response = self.llm_client.call_with_retry(self.outline_prompt, input_data)
+                response = self.llm_client.call_with_retry(self.outline_prompt, input_data, language=language)
                 
                 if response:
                     # Parse response and attach chunk index
@@ -201,7 +202,7 @@ class OutlineExtractor:
         with open(input_path, 'r', encoding='utf-8') as f:
             return json.load(f)
 
-def run_step1_outline(srt_path: Path, metadata_dir: Path = None, output_path: Optional[Path] = None, prompt_files: Dict = None) -> List[Dict]:
+def run_step1_outline(srt_path: Path, metadata_dir: Path = None, output_path: Optional[Path] = None, prompt_files: Dict = None, language: Optional[str] = None) -> List[Dict]:
     """
     Run Step 1: Outline Extraction
     """
@@ -209,7 +210,7 @@ def run_step1_outline(srt_path: Path, metadata_dir: Path = None, output_path: Op
         metadata_dir = METADATA_DIR
         
     extractor = OutlineExtractor(metadata_dir, prompt_files)
-    outlines = extractor.extract_outline(srt_path)
+    outlines = extractor.extract_outline(srt_path, language=language)
     
     if output_path is None:
         output_path = metadata_dir / "step1_outline.json"

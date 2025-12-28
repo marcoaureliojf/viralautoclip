@@ -29,12 +29,13 @@ class ClusteringEngine:
             metadata_dir = METADATA_DIR
         self.metadata_dir = metadata_dir
     
-    def cluster_clips(self, clips_with_titles: List[Dict]) -> List[Dict]:
+    def cluster_clips(self, clips_with_titles: List[Dict], language: Optional[str] = None) -> List[Dict]:
         """
         对片段进行主题聚类
         
         Args:
             clips_with_titles: 带标题的片段列表
+            language: 目标语言
             
         Returns:
             合集数据列表
@@ -67,7 +68,7 @@ class ClusteringEngine:
         
         try:
             # 调用大模型进行聚类
-            response = self.llm_client.call_with_retry(full_prompt)
+            response = self.llm_client.call_with_retry(full_prompt, language=language)
             
             # 解析JSON响应
             collections_data = self.llm_client.parse_json_response(response)
@@ -325,7 +326,7 @@ class ClusteringEngine:
         with open(input_path, 'r', encoding='utf-8') as f:
             return json.load(f)
 
-def run_step5_clustering(clips_with_titles_path: Path, output_path: Optional[Path] = None, metadata_dir: Optional[str] = None, prompt_files: Dict = None) -> List[Dict]:
+def run_step5_clustering(clips_with_titles_path: Path, output_path: Optional[Path] = None, metadata_dir: Optional[str] = None, prompt_files: Dict = None, language: Optional[str] = None) -> List[Dict]:
     """
     运行Step 5: 主题聚类
     
@@ -333,6 +334,7 @@ def run_step5_clustering(clips_with_titles_path: Path, output_path: Optional[Pat
         clips_with_titles_path: 带标题的片段文件路径
         output_path: 输出文件路径
         prompt_files: 自定义提示词文件
+        language: 目标语言
         
     Returns:
         合集数据
@@ -347,7 +349,7 @@ def run_step5_clustering(clips_with_titles_path: Path, output_path: Optional[Pat
     clusterer = ClusteringEngine(metadata_dir=Path(metadata_dir), prompt_files=prompt_files)
     
     # 进行聚类
-    collections_data = clusterer.cluster_clips(clips_with_titles)
+    collections_data = clusterer.cluster_clips(clips_with_titles, language=language)
     
     # 保存结果
     if output_path is None:

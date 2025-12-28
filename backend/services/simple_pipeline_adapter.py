@@ -13,6 +13,8 @@ from backend.pipeline.step3_scoring import run_step3_scoring
 from backend.pipeline.step4_title import run_step4_title
 from backend.pipeline.step5_clustering import run_step5_clustering
 from backend.pipeline.step6_video import run_step6_video
+from backend.utils.llm_client import LLMClient
+from backend.utils.text_processor import TextProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +25,8 @@ class SimplePipelineAdapter:
     def __init__(self, project_id: str, task_id: str):
         self.project_id = project_id
         self.task_id = task_id
+        self.llm_client = LLMClient()
+        self.text_processor = TextProcessor()
         
     async def _generate_subtitle_automatically(self, video_path: str, metadata_dir: Path) -> Path:
         """
@@ -101,6 +105,45 @@ class SimplePipelineAdapter:
         except Exception as e:
             logger.error(f"自动生成字幕过程中发生错误: {e}")
             return None
+            
+    async def _detect_language(self, srt_path: Path) -> str:
+        """
+        根据字幕内容自动检测语言
+        """
+        try:
+            logger.info(f"开始检测字幕语言: {srt_path}")
+            srt_data = self.text_processor.parse_srt(srt_path)
+            if not srt_data:
+                return "English" # 默认值
+                
+            # 取前10条字幕进行检测，避免发送过多文本
+            sample_text = " ".join([entry['text'] for entry in srt_data[:10]])
+            
+            prompt = """Analyze the following text and identify its primary language. 
+Return ONLY the name of the language in English (e.g., 'Portuguese', 'English', 'Chinese', 'Spanish', 'French').
+Do NOT include any other text or explanation.
+
+Text:
+{text}"""
+            
+            response = self.llm_client.call(prompt, {"text": sample_text})
+            detected_lang = response.strip().strip("'").strip('"')
+            
+            # 简单的验证，防止模型返回废话
+            valid_languages = ["Portuguese", "English", "Chinese", "Spanish", "French", "German", "Japanese", "Korean", "Italian", "Russian"]
+            if any(lang.lower() in detected_lang.lower() for lang in valid_languages):
+                # 提取标准名称
+                for lang in valid_languages:
+                    if lang.lower() in detected_lang.lower():
+                        logger.info(f"检测到语言: {lang}")
+                        return lang
+            
+            logger.warning(f"无法确定具体语言，原始响应: {detected_lang}，默认使用 English")
+            return "English"
+            
+        except Exception as e:
+            logger.error(f"语言检测失败: {e}")
+            return "English"
         
     async def process_project_sync(self, input_video_path: str, input_srt_path: str) -> Dict[str, Any]:
         """
@@ -140,24 +183,38 @@ class SimplePipelineAdapter:
             
             # Step 1: 大纲提取
             logger.info("执行Step 1: 大纲提取")
+            srt_path_to_use = None
             if input_srt_path and Path(input_srt_path).exists():
                 logger.info(f"使用现有SRT文件: {input_srt_path}")
-                outlines = run_step1_outline(Path(input_srt_path), metadata_dir=metadata_dir)
+                srt_path_to_use = Path(input_srt_path)
             else:
                 logger.warning("没有SRT文件，尝试自动生成字幕")
                 # 尝试自动生成字幕
-                srt_path = await self._generate_subtitle_automatically(input_video_path, metadata_dir)
-                if srt_path and srt_path.exists():
-                    logger.info(f"自动生成字幕成功: {srt_path}")
-                    outlines = run_step1_outline(srt_path, metadata_dir=metadata_dir)
-                else:
-                    logger.warning("自动生成字幕失败，创建空大纲")
-                    # 创建一个空的大纲文件
-                    outlines = []
-                    outline_file = metadata_dir / "step1_outline.json"
-                    import json
-                    with open(outline_file, 'w', encoding='utf-8') as f:
-                        json.dump(outlines, f, ensure_ascii=False, indent=2)
+                srt_path_generated = await self._generate_subtitle_automatically(input_video_path, metadata_dir)
+                if srt_path_generated and srt_path_generated.exists():
+                    logger.info(f"自动生成字幕成功: {srt_path_generated}")
+                    srt_path_to_use = srt_path_generated
+            
+            # 检测语言
+            detected_language = "English"
+            if srt_path_to_use:
+                detected_language = await self._detect_language(srt_path_to_use)
+                logger.info(f"项目语言设置为: {detected_language}")
+            
+            if srt_path_to_use:
+                outlines = run_step1_outline(
+                    srt_path_to_use, 
+                    metadata_dir=metadata_dir,
+                    language=detected_language
+                )
+            else:
+                logger.warning("无法获取字幕文件，创建空大纲")
+                # 创建一个空的大纲文件
+                outlines = []
+                outline_file = metadata_dir / "step1_outline.json"
+                import json
+                with open(outline_file, 'w', encoding='utf-8') as f:
+                    json.dump(outlines, f, ensure_ascii=False, indent=2)
             emit_progress(self.project_id, "SUBTITLE", "字幕处理完成", subpercent=50)
             
             # 阶段3: 内容分析
@@ -168,7 +225,8 @@ class SimplePipelineAdapter:
             if outlines:  # 只有当有大纲时才执行后续步骤
                 timeline_data = run_step2_timeline(
                     metadata_dir / "step1_outline.json",
-                    metadata_dir=metadata_dir
+                    metadata_dir=metadata_dir,
+                    language=detected_language
                 )
                 emit_progress(self.project_id, "ANALYZE", "时间线提取完成", subpercent=50)
                 
@@ -176,7 +234,8 @@ class SimplePipelineAdapter:
                 logger.info("执行Step 3: 内容评分")
                 scored_clips = run_step3_scoring(
                     metadata_dir / "step2_timeline.json",
-                    metadata_dir=metadata_dir
+                    metadata_dir=metadata_dir,
+                    language=detected_language
                 )
                 emit_progress(self.project_id, "ANALYZE", "内容分析完成", subpercent=100)
             else:
@@ -202,7 +261,8 @@ class SimplePipelineAdapter:
             if outlines:  # 只有当有大纲时才执行后续步骤
                 titled_clips = run_step4_title(
                     metadata_dir / "step3_high_score_clips.json",
-                    metadata_dir=str(metadata_dir)
+                    metadata_dir=str(metadata_dir),
+                    language=detected_language
                 )
                 emit_progress(self.project_id, "HIGHLIGHT", "标题生成完成", subpercent=40)
                 
@@ -210,7 +270,8 @@ class SimplePipelineAdapter:
                 logger.info("执行Step 5: 主题聚类")
                 collections = run_step5_clustering(
                     metadata_dir / "step4_titles.json",
-                    metadata_dir=str(metadata_dir)
+                    metadata_dir=str(metadata_dir),
+                    language=detected_language
                 )
                 emit_progress(self.project_id, "HIGHLIGHT", "片段定位完成", subpercent=100)
                 

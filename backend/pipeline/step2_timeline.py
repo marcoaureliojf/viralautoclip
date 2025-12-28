@@ -37,7 +37,7 @@ class TimelineExtractor:
         self.timeline_chunks_dir = self.metadata_dir / "step2_timeline_chunks"
         self.llm_raw_output_dir = self.metadata_dir / "step2_llm_raw_output"
 
-    def extract_timeline(self, outlines: List[Dict]) -> List[Dict]:
+    def extract_timeline(self, outlines: List[Dict], language: Optional[str] = None) -> List[Dict]:
         """
         Extract time intervals for each topic in the outline from the outline and SRT subtitle.
         Features:
@@ -127,7 +127,7 @@ class TimelineExtractor:
                     
                     for retry_count in range(max_parse_retries + 1):
                         try:
-                            raw_response = self.llm_client.call_with_retry(self.timeline_prompt, input_data)
+                            raw_response = self.llm_client.call_with_retry(self.timeline_prompt, input_data, language=language)
                             
                             if not raw_response:
                                 logger.warning(f"  > Block {chunk_index} LLM response is empty, skipping")
@@ -324,7 +324,7 @@ class TimelineExtractor:
         with open(input_path, 'r', encoding='utf-8') as f:
             return json.load(f)
 
-def run_step2_timeline(outline_path: Path, metadata_dir: Path = None, output_path: Optional[Path] = None, prompt_files: Dict = None) -> List[Dict]:
+def run_step2_timeline(outline_path: Path, metadata_dir: Path = None, output_path: Optional[Path] = None, prompt_files: Dict = None, language: Optional[str] = None) -> List[Dict]:
     """Run Step 2: Timestamp Extraction"""
     if metadata_dir is None:
         metadata_dir = METADATA_DIR
@@ -335,7 +335,7 @@ def run_step2_timeline(outline_path: Path, metadata_dir: Path = None, output_pat
     with open(outline_path, 'r', encoding='utf-8') as f:
         outlines = json.load(f)
         
-    timeline_data = extractor.extract_timeline(outlines)
+    timeline_data = extractor.extract_timeline(outlines, language=language)
     
     # Save results
     if output_path is None:

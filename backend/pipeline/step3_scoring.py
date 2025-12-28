@@ -27,7 +27,7 @@ class ClipScorer:
         with open(prompt_files_to_use['recommendation'], 'r', encoding='utf-8') as f:
             self.recommendation_prompt = f.read()
     
-    def score_clips(self, timeline_data: List[Dict]) -> List[Dict]:
+    def score_clips(self, timeline_data: List[Dict], language: Optional[str] = None) -> List[Dict]:
         """
         为切片评分 (新版：按块批量处理，并使用LLM进行综合评估)
         """
@@ -52,7 +52,7 @@ class ClipScorer:
             logger.info(f"处理块 {chunk_index}，其中包含 {len(chunk_items)} 个话题...")
             try:
                 # 3. 使用LLM进行批量评估
-                scored_chunk_items = self._get_llm_evaluation(chunk_items)
+                scored_chunk_items = self._get_llm_evaluation(chunk_items, language=language)
                 
                 if scored_chunk_items:
                     all_scored_clips.extend(scored_chunk_items)
@@ -76,7 +76,7 @@ class ClipScorer:
         logger.info("所有切片评分完成")
         return all_scored_clips
     
-    def _get_llm_evaluation(self, clips: List[Dict]) -> List[Dict]:
+    def _get_llm_evaluation(self, clips: List[Dict], language: Optional[str] = None) -> List[Dict]:
         """
         使用LLM进行批量评估，为每个clip添加 final_score 和 recommend_reason
         """
@@ -91,7 +91,7 @@ class ClipScorer:
                 } for clip in clips
             ]
             
-            response = self.llm_client.call_with_retry(self.recommendation_prompt, input_for_llm)
+            response = self.llm_client.call_with_retry(self.recommendation_prompt, input_for_llm, language=language)
             parsed_list = self.llm_client.parse_json_response(response)
             
             if not isinstance(parsed_list, list) or len(parsed_list) != len(clips):
@@ -134,7 +134,7 @@ class ClipScorer:
             json.dump(scored_clips, f, ensure_ascii=False, indent=2)
         logger.info(f"评分结果已保存到: {output_path}")
 
-def run_step3_scoring(timeline_path: Path, metadata_dir: Path = None, output_path: Optional[Path] = None, prompt_files: Dict = None) -> List[Dict]:
+def run_step3_scoring(timeline_path: Path, metadata_dir: Path = None, output_path: Optional[Path] = None, prompt_files: Dict = None, language: Optional[str] = None) -> List[Dict]:
     """
     运行Step 3: 内容评分与筛选
     
@@ -142,6 +142,7 @@ def run_step3_scoring(timeline_path: Path, metadata_dir: Path = None, output_pat
         timeline_path: 时间线文件路径
         output_path: 输出文件路径
         prompt_files: 自定义提示词文件
+        language: 目标语言
         
     Returns:
         高分切片列表
@@ -154,7 +155,7 @@ def run_step3_scoring(timeline_path: Path, metadata_dir: Path = None, output_pat
     scorer = ClipScorer(prompt_files)
     
     # 评分
-    scored_clips = scorer.score_clips(timeline_data)
+    scored_clips = scorer.score_clips(timeline_data, language=language)
     
     # 筛选高分切片
     high_score_clips = [clip for clip in scored_clips if clip['final_score'] >= MIN_SCORE_THRESHOLD]

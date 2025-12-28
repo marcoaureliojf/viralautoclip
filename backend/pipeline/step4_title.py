@@ -33,7 +33,7 @@ class TitleGenerator:
         self.metadata_dir = metadata_dir
         self.llm_raw_output_dir = self.metadata_dir / "step4_llm_raw_output"
     
-    def generate_titles(self, high_score_clips: List[Dict]) -> List[Dict]:
+    def generate_titles(self, high_score_clips: List[Dict], language: Optional[str] = None) -> List[Dict]:
         """
         为高分切片生成标题 (新版：按块批量处理，并增加缓存)
         """
@@ -63,7 +63,7 @@ class TitleGenerator:
                     } for clip in chunk_clips
                 ]
                 
-                raw_response = self.llm_client.call_with_retry(self.title_prompt, input_for_llm)
+                raw_response = self.llm_client.call_with_retry(self.title_prompt, input_for_llm, language=language)
                 
                 if raw_response:
                     # 保存LLM原始响应用于调试（但不用作缓存）
@@ -114,7 +114,7 @@ class TitleGenerator:
             json.dump(clips_with_titles, f, ensure_ascii=False, indent=2)
         logger.info(f"带标题的片段数据已保存到: {output_path}")
 
-def run_step4_title(high_score_clips_path: Path, output_path: Optional[Path] = None, metadata_dir: Optional[str] = None, prompt_files: Dict = None) -> List[Dict]:
+def run_step4_title(high_score_clips_path: Path, output_path: Optional[Path] = None, metadata_dir: Optional[str] = None, prompt_files: Dict = None, language: Optional[str] = None) -> List[Dict]:
     """
     运行Step 4: 标题生成
     
@@ -123,6 +123,7 @@ def run_step4_title(high_score_clips_path: Path, output_path: Optional[Path] = N
         output_path: 输出文件路径，默认为step4_titles.json
         metadata_dir: 元数据目录路径
         prompt_files: 自定义提示词文件
+        language: 目标语言
         
     Returns:
         带标题的切片列表
@@ -141,7 +142,7 @@ def run_step4_title(high_score_clips_path: Path, output_path: Optional[Path] = N
     title_generator = TitleGenerator(metadata_dir=Path(metadata_dir), prompt_files=prompt_files)
     
     # 生成标题
-    clips_with_titles = title_generator.generate_titles(high_score_clips)
+    clips_with_titles = title_generator.generate_titles(high_score_clips, language=language)
     
     # 确定输出路径
     if metadata_dir is None:

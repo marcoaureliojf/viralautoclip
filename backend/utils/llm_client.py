@@ -31,21 +31,30 @@ class LLMClient:
         """Retorna o modelo atual definido no settings.json"""
         return config_manager.settings.model_name
     
-    def call(self, prompt: str, input_data: Any = None) -> str:
+    def call(self, prompt: str, input_data: Any = None, language: Optional[str] = None) -> str:
         try:
+            if language:
+                prompt = self._inject_language_instruction(prompt, language)
             return self.llm_manager.call(prompt, input_data)
         except Exception as e:
             logger.error(f"LLM call failed: {str(e)}")
             raise
     
-    def call_with_retry(self, prompt: str, input_data: Any = None, max_retries: int = None) -> str:
+    def call_with_retry(self, prompt: str, input_data: Any = None, max_retries: int = None, language: Optional[str] = None) -> str:
         # Se max_retries não for passado, usa o do config
         retries = max_retries or config_manager.settings.max_retries
         try:
+            if language:
+                prompt = self._inject_language_instruction(prompt, language)
             return self.llm_manager.call_with_retry(prompt, input_data, max_retries=retries)
         except Exception as e:
             logger.error(f"LLM retry call failed: {str(e)}")
             raise
+
+    def _inject_language_instruction(self, prompt: str, language: str) -> str:
+        """Injeta instrução de idioma no final do prompt original"""
+        lang_instruction = f"\n\nIMPORTANT: You MUST output all textual content (titles, descriptions, reasons, etc.) in {language}. Keep JSON keys and structural identifiers in English."
+        return prompt + lang_instruction
 
     def parse_json_response(self, response: str) -> Any:
         """
