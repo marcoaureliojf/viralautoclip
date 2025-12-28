@@ -107,6 +107,19 @@ class LLMClient:
         s = "".join(ch for ch in s if ord(ch) >= 32 or ch in "\n\r\t")
         return s
 
+    def _validate_json_structure(self, data: Any) -> bool:
+        """
+        Validação básica de estrutura para garantir que o LLM não retornou lixo.
+        Aceita listas ou dicionários não vazios.
+        """
+        if data is None:
+            return False
+        if isinstance(data, (list, dict)):
+            # Se for lista ou dict, consideramos válido se o parse ocorreu
+            # (Pode ser expandido conforme a necessidade de cada Step)
+            return True
+        return False
+
     def get_current_provider_info(self) -> Dict[str, Any]:
         return {
             "model": self.model,

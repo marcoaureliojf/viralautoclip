@@ -83,6 +83,7 @@ COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
 
 # 复制项目文件
 COPY backend/ ./backend/
+COPY prompt/ ./prompt/
 COPY scripts/ ./scripts/
 COPY *.sh ./
 COPY env.example .env

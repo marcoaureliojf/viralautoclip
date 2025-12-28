@@ -64,6 +64,9 @@ class Settings(BaseSettings):
 # 全局配置实例
 settings = Settings()
 
+# Para compatibilidade com módulos que ainda usam shared_config (ex: llm_client, llm_manager)
+from .shared_config import config_manager
+
 def get_project_root() -> Path:
     """获取项目根目录"""
     # 使用新的路径工具

@@ -41,6 +41,7 @@ VIDEO_CATEGORIES_CONFIG = {
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 SETTINGS_FILE = DATA_DIR / "settings.json"
+PROMPT_DIR = PROJECT_ROOT / "prompt"
 
 # ==========================================
 # 3. SISTEMA DE CONFIGURAÇÃO DINÂMICA (Pydantic)
@@ -104,17 +105,42 @@ class ConfigManager:
         self.load()
 
     def load(self):
-        """Carrega dados do settings.json"""
+        """Carrega dados do settings.json e sobrescreve com variáveis de ambiente se presentes"""
         if SETTINGS_FILE.exists():
             try:
                 with open(SETTINGS_FILE, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    # O Pydantic valida e preenche o objeto settings automaticamente
                     self.settings = Settings(**data)
             except Exception as e:
                 print(f"⚠️ Erro ao carregar {SETTINGS_FILE}: {e}")
         else:
             print(f"ℹ️ {SETTINGS_FILE} não encontrado. Usando padrões.")
+        
+        # Sobrescreve com variáveis de ambiente (Docker friendly)
+        env_provider = os.getenv("LLM_PROVIDER")
+        if env_provider:
+            self.settings.llm_provider = env_provider
+            
+        env_model = os.getenv("API_MODEL_NAME")
+        if env_model:
+            self.settings.model_name = env_model
+            
+        # Mapeamento de chaves de ambiente para campos de settings
+        key_mapping = {
+            "GROQ_API_KEY": "groq_api_key",
+            "OPENROUTER_API_KEY": "openrouter_api_key",
+            "OPENAI_API_KEY": "openai_api_key",
+            "GEMINI_API_KEY": "gemini_api_key",
+            "DASH_SCOPE_API_KEY": "dashscope_api_key",
+            "API_DASHSCOPE_API_KEY": "dashscope_api_key",
+            "SILICONFLOW_API_KEY": "siliconflow_api_key",
+            "TOGETHER_API_KEY": "together_api_key"
+        }
+        
+        for env_key, setting_field in key_mapping.items():
+            val = os.getenv(env_key)
+            if val:
+                setattr(self.settings, setting_field, val)
 
     def get_api_config(self) -> APIConfig:
         """
@@ -166,6 +192,43 @@ class ConfigManager:
 config_manager = ConfigManager()
 
 # ==========================================
+# 6. FUNÇÕES DE UTILITÁRIO (PROMPTS)
+# ==========================================
+
+def get_prompt_files(category: str = "default") -> Dict[str, Path]:
+    """Retorna o mapeamento de arquivos de prompt para uma categoria"""
+    base = PROMPT_DIR
+    if category and category != "default":
+        cat_path = PROMPT_DIR / category
+        if cat_path.exists():
+            base = cat_path
+            
+    return {
+        "outline": base / "大纲.txt",
+        "timeline": base / "时间点.txt",
+        "recommendation": base / "推荐理由.txt",
+        "scoring": base / "推荐理由.txt",  # Alias
+        "title": base / "标题生成.txt",
+        "clustering": base / "主题聚类.txt"
+    }
+
+# Mapeamento Padrão
+PROMPT_FILES = get_prompt_files()
+
+# ==========================================
+# 7. CONSTANTES DE COMPATIBILIDADE (LEGACY)
+# ==========================================
+# Estas constantes permitem que módulos antigos continuem funcionando
+# enquanto migramos para o ConfigManager dinâmico.
+
+CHUNK_SIZE = config_manager.settings.chunk_size
+MIN_SCORE_THRESHOLD = config_manager.settings.min_score_threshold
+MAX_CLIPS_PER_COLLECTION = config_manager.settings.max_clips_per_collection
+METADATA_DIR = DATA_DIR / "output" / "metadata"
+CLIPS_DIR = DATA_DIR / "output" / "clips"
+COLLECTIONS_DIR = DATA_DIR / "output" / "collections"
+
+# ==========================================
 # 5. COMPATIBILIDADE COM CÓDIGO LEGADO
 # ==========================================
 
@@ -180,8 +243,9 @@ def get_legacy_config() -> Dict[str, Any]:
         'LLM_PROVIDER': s.llm_provider,
         'API_KEY': api.api_key,
         'BASE_URL': api.base_url,
-        'CHUNK_SIZE': s.chunk_size,
-        'MIN_SCORE_THRESHOLD': s.min_score_threshold,
-        'MAX_CLIPS_PER_COLLECTION': s.max_clips_per_collection,
-        'METADATA_DIR': DATA_DIR / "output" / "metadata",
+        'CHUNK_SIZE': CHUNK_SIZE,
+        'MIN_SCORE_THRESHOLD': MIN_SCORE_THRESHOLD,
+        'MAX_CLIPS_PER_COLLECTION': MAX_CLIPS_PER_COLLECTION,
+        'METADATA_DIR': METADATA_DIR,
+        'PROMPT_FILES': PROMPT_FILES,
     }

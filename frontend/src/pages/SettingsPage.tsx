@@ -84,6 +84,14 @@ const SettingsPage: React.FC = () => {
       description: t('settings.providers.g4f'),
       apiKeyField: 'g4f_api_key',
       placeholder: t('settings.form.api_key_placeholder')
+    },
+    cerebras: {
+      name: 'Cerebras',
+      icon: <RobotOutlined />,
+      color: '#34d399',
+      description: 'Cerebras AI (Ultra Fast)',
+      apiKeyField: 'cerebras_api_key',
+      placeholder: t('settings.form.api_key_placeholder')
     }
   }
 
@@ -261,10 +269,15 @@ const SettingsPage: React.FC = () => {
                   >
                     {availableModels[selectedProvider]?.map((model: any) => (
                       <Select.Option key={model.name} value={model.name}>
-                        <Space>
-                          <span>{model.display_name}</span>
-                          <Tag>最大{model.max_tokens} tokens</Tag>
-                        </Space>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                          <Space>
+                            <span style={{ fontWeight: 500 }}>{model.display_name}</span>
+                            {model.is_free && <Tag color="green" style={{ borderRadius: '4px', margin: 0 }}>FREE</Tag>}
+                          </Space>
+                          <Tag style={{ border: 'none', background: 'rgba(255,255,255,0.1)', color: '#aaa', margin: 0 }}>
+                            {model.max_tokens >= 1000 ? `${model.max_tokens/1000}k` : model.max_tokens} tokens
+                          </Tag>
+                        </div>
                       </Select.Option>
                     ))}
                   </Select>

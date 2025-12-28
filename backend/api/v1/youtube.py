@@ -449,7 +449,6 @@ async def process_youtube_download_task(task_id: str, request: YouTubeDownloadRe
             
             # 移动视频文件到项目目录
             import shutil
-            from pathlib import Path
             
             if video_path:
                 video_file_path = Path(video_path)

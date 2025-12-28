@@ -29,15 +29,14 @@ services:
       - ./data:/app/data:rw
       - ./logs:/app/logs:rw
       - ./uploads:/app/uploads:rw
+      - ./prompt:/app/prompt:ro
+      - ./.env:/app/.env:ro
     environment:
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=sqlite:///./data/autoclip.db
       - ENVIRONMENT=production
       - DEBUG=false
       - LOG_LEVEL=INFO
-      # Configurações LLM (Mapeadas conforme config.py)
-      - API_MODEL_NAME=llama-3.1-8b-instant
-      - API_TIMEOUT=60
     depends_on:
       redis:
         condition: service_healthy
@@ -48,7 +47,7 @@ services:
       retries: 3
       start_period: 40s
 
-  # Celery Worker服务 (Processamento Pesado: Whisper + LLM + FFmpeg)
+  # Celery Worker服务 (Processamento Pesado)
   celery-worker:
     build:
       context: .
@@ -59,6 +58,8 @@ services:
       - ./data:/app/data:rw
       - ./logs:/app/logs:rw
       - ./uploads:/app/uploads:rw
+      - ./prompt:/app/prompt:ro
+      - ./.env:/app/.env:ro
     deploy:
       resources:
         reservations:
@@ -72,10 +73,6 @@ services:
       - ENVIRONMENT=production
       - DEBUG=false
       - LOG_LEVEL=INFO
-      # Configurações LLM (Essenciais para o Worker não falhar)
-      - API_MODEL_NAME=llama-3.1-8b-instant
-      - API_TIMEOUT=60
-      - LLM_PROVIDER=groq
       - SPEECH_RECOGNITION_METHOD=whisper_local
       - WHISPER_MODEL=base
       - PYTHONPATH=/app
@@ -86,7 +83,7 @@ services:
       autoclip:
         condition: service_healthy
 
-  # Celery Beat调度器 (Tarefas Agendadas)
+  # Celery Beat调度器
   celery-beat:
     build:
       context: .
@@ -96,6 +93,7 @@ services:
     volumes:
       - ./data:/app/data:rw
       - ./logs:/app/logs:rw
+      - ./.env:/app/.env:ro
     environment:
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=sqlite:///./data/autoclip.db
@@ -116,6 +114,8 @@ services:
     restart: unless-stopped
     ports:
       - "5555:5555"
+    volumes:
+      - ./.env:/app/.env:ro
     environment:
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=sqlite:///./data/autoclip.db

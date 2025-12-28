@@ -23,6 +23,7 @@ class ProviderType(Enum):
     TOGETHER = "together"    # Together AI
     OPENROUTER = "openrouter" # OpenRouter
     G4F = "g4f"              # GPT4Free (Custo Zero)
+    CEREBRAS = "cerebras"    # Cerebras
 
 @dataclass
 class ModelInfo:
@@ -33,6 +34,7 @@ class ModelInfo:
     max_tokens: int
     cost_per_token: Optional[float] = None
     description: Optional[str] = None
+    is_free: bool = False
 
 @dataclass
 class LLMResponse:
@@ -160,21 +162,24 @@ class DashScopeProvider(LLMProvider):
                 display_name="通义千问Plus",
                 provider=ProviderType.DASHSCOPE,
                 max_tokens=8192,
-                description="阿里云通义千问Plus模型"
+                description="阿里云通义千问Plus模型",
+                is_free=False
             ),
             ModelInfo(
                 name="qwen-max",
                 display_name="通义千问Max",
                 provider=ProviderType.DASHSCOPE,
                 max_tokens=8192,
-                description="阿里云通义千问Max模型"
+                description="阿里云通义千问Max模型",
+                is_free=False
             ),
             ModelInfo(
                 name="qwen-turbo",
                 display_name="通义千问Turbo",
                 provider=ProviderType.DASHSCOPE,
                 max_tokens=8192,
-                description="阿里云通义千问Turbo模型"
+                description="阿里云通义千问Turbo模型",
+                is_free=False
             )
         ]
 
@@ -235,21 +240,24 @@ class OpenAIProvider(LLMProvider):
                 display_name="GPT-3.5 Turbo",
                 provider=ProviderType.OPENAI,
                 max_tokens=4096,
-                description="OpenAI GPT-3.5 Turbo模型"
+                description="OpenAI GPT-3.5 Turbo模型",
+                is_free=False
             ),
             ModelInfo(
                 name="gpt-4",
                 display_name="GPT-4",
                 provider=ProviderType.OPENAI,
                 max_tokens=8192,
-                description="OpenAI GPT-4模型"
+                description="OpenAI GPT-4模型",
+                is_free=False
             ),
             ModelInfo(
                 name="gpt-4-turbo",
                 display_name="GPT-4 Turbo",
                 provider=ProviderType.OPENAI,
                 max_tokens=128000,
-                description="OpenAI GPT-4 Turbo模型"
+                description="OpenAI GPT-4 Turbo模型",
+                is_free=False
             )
         ]
 
@@ -299,21 +307,24 @@ class GeminiProvider(LLMProvider):
                 display_name="Gemini 2.5 Flash",
                 provider=ProviderType.GEMINI,
                 max_tokens=1000000,
-                description="Google Gemini 2.5 Flash模型"
+                description="Google Gemini 2.5 Flash模型",
+                is_free=False
             ),
             ModelInfo(
                 name="gemini-1.5-pro",
                 display_name="Gemini 1.5 Pro",
                 provider=ProviderType.GEMINI,
                 max_tokens=2000000,
-                description="Google Gemini 1.5 Pro模型"
+                description="Google Gemini 1.5 Pro模型",
+                is_free=False
             ),
             ModelInfo(
                 name="gemini-1.5-flash",
                 display_name="Gemini 1.5 Flash",
                 provider=ProviderType.GEMINI,
                 max_tokens=1000000,
-                description="Google Gemini 1.5 Flash模型"
+                description="Google Gemini 1.5 Flash模型",
+                is_free=False
             )
         ]
 
@@ -384,28 +395,32 @@ class SiliconFlowProvider(LLMProvider):
                 display_name="Qwen2.5-7B",
                 provider=ProviderType.SILICONFLOW,
                 max_tokens=32768,
-                description="硅基流动Qwen2.5-7B模型"
+                description="硅基流动Qwen2.5-7B模型",
+                is_free=True
             ),
             ModelInfo(
                 name="Qwen/Qwen2.5-14B-Instruct",
                 display_name="Qwen2.5-14B",
                 provider=ProviderType.SILICONFLOW,
                 max_tokens=32768,
-                description="硅基流动Qwen2.5-14B模型"
+                description="硅基流动Qwen2.5-14B模型",
+                is_free=True
             ),
             ModelInfo(
                 name="Qwen/Qwen2.5-32B-Instruct",
                 display_name="Qwen2.5-32B",
                 provider=ProviderType.SILICONFLOW,
                 max_tokens=32768,
-                description="硅基流动Qwen2.5-32B模型"
+                description="硅基流动Qwen2.5-32B模型",
+                is_free=False
             ),
             ModelInfo(
                 name="deepseek-ai/DeepSeek-V2.5",
                 display_name="DeepSeek-V2.5",
                 provider=ProviderType.SILICONFLOW,
                 max_tokens=65536,
-                description="硅基流动DeepSeek-V2.5模型"
+                description="硅基流动DeepSeek-V2.5模型",
+                is_free=True
             )
         ]
 
@@ -449,9 +464,12 @@ class GroqProvider(LLMProvider):
 
     def get_available_models(self) -> List[ModelInfo]:
         return [
-            ModelInfo("llama-3.1-70b-versatile", "Llama 3.1 70B (Groq)", ProviderType.GROQ, 32768),
-            ModelInfo("llama-3.1-8b-instant", "Llama 3.1 8B (Groq)", ProviderType.GROQ, 8192),
-            ModelInfo("mixtral-8x7b-32768", "Mixtral 8x7B (Groq)", ProviderType.GROQ, 32768),
+            ModelInfo("llama-3.1-8b-instant", "Llama 3.1 8B (Groq)", ProviderType.GROQ, 131072, is_free=True),
+            ModelInfo("llama-3.3-70b-versatile", "Llama 3.3 70B (Groq)", ProviderType.GROQ, 131072, is_free=False),
+            ModelInfo("meta-llama/llama-guard-4-12b", "Llama Guard 4 12B (Groq)", ProviderType.GROQ, 131072, is_free=False),
+            ModelInfo("openai/gpt-oss-120b", "GPT OSS 120B (Groq)", ProviderType.GROQ, 131072, is_free=False),
+            ModelInfo("openai/gpt-oss-20b", "GPT OSS 20B (Groq)", ProviderType.GROQ, 131072, is_free=False),
+            ModelInfo("mixtral-8x7b-32768", "Mixtral 8x7B (Groq)", ProviderType.GROQ, 32768, is_free=True),
         ]
 
 class TogetherProvider(LLMProvider):
@@ -494,8 +512,8 @@ class TogetherProvider(LLMProvider):
 
     def get_available_models(self) -> List[ModelInfo]:
         return [
-            ModelInfo("meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", "Llama 3.1 70B (Together)", ProviderType.TOGETHER, 131072),
-            ModelInfo("meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo", "Llama 3.1 8B (Together)", ProviderType.TOGETHER, 131072),
+            ModelInfo("meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", "Llama 3.1 70B (Together)", ProviderType.TOGETHER, 131072, is_free=False),
+            ModelInfo("meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo", "Llama 3.1 8B (Together)", ProviderType.TOGETHER, 131072, is_free=False),
         ]
 
 class OpenRouterProvider(LLMProvider):
@@ -538,9 +556,18 @@ class OpenRouterProvider(LLMProvider):
 
     def get_available_models(self) -> List[ModelInfo]:
         return [
-            ModelInfo("google/gemini-flash-1.5", "Gemini Flash 1.5 (OpenRouter)", ProviderType.OPENROUTER, 1000000),
-            ModelInfo("anthropic/claude-3.5-sonnet", "Claude 3.5 Sonnet (OpenRouter)", ProviderType.OPENROUTER, 200000),
-            ModelInfo("meta-llama/llama-3.1-405b", "Llama 3.1 405B (OpenRouter)", ProviderType.OPENROUTER, 131072),
+            ModelInfo("xiaomi/mimo-v2-flash:free", "Xiaomi MiMo-V2-Flash (Free)", ProviderType.OPENROUTER, 262144, is_free=True),
+            ModelInfo("mistralai/mistral-devstral-2512:free", "Mistral Devstral 2 2512 (Free)", ProviderType.OPENROUTER, 262144, is_free=True),
+            ModelInfo("kwaipilot/kat-coder-pro-v1:free", "Kwaipilot KAT-Coder-Pro V1 (Free)", ProviderType.OPENROUTER, 256000, is_free=True),
+            ModelInfo("tngtech/deepseek-r1t2-chimera:free", "TNG DeepSeek R1T2 Chimera (Free)", ProviderType.OPENROUTER, 164000, is_free=True),
+            ModelInfo("nex-agi/deepseek-v3.1-nex-n1:free", "Nex AGI DeepSeek V3.1 Nex N1 (Free)", ProviderType.OPENROUTER, 131000, is_free=True),
+            ModelInfo("nvidia/nemotron-3-nano-30b-a3b:free", "NVIDIA Nemotron 3 Nano 30B A3B (Free)", ProviderType.OPENROUTER, 256000, is_free=True),
+            ModelInfo("tngtech/deepseek-r1t-chimera:free", "TNG DeepSeek R1T Chimera (Free)", ProviderType.OPENROUTER, 164000, is_free=True),
+            ModelInfo("z-ai/glm-4.5-air:free", "Z.AI GLM 4.5 Air (Free)", ProviderType.OPENROUTER, 131000, is_free=True),
+            ModelInfo("nvidia/nemotron-nano-12b-2-vl:free", "NVIDIA Nemotron Nano 12B 2 VL (Free)", ProviderType.OPENROUTER, 128000, is_free=True),
+            ModelInfo("tngtech/r1t-chimera:free", "TNG R1T Chimera (Free)", ProviderType.OPENROUTER, 164000, is_free=True),
+            ModelInfo("google/gemini-flash-1.5", "Gemini Flash 1.5", ProviderType.OPENROUTER, 1000000, is_free=False),
+            ModelInfo("anthropic/claude-3.5-sonnet", "Claude 3.5 Sonnet", ProviderType.OPENROUTER, 200000, is_free=False),
         ]
 
 class G4FProvider(LLMProvider):
@@ -593,9 +620,34 @@ class G4FProvider(LLMProvider):
 
     def get_available_models(self) -> List[ModelInfo]:
         return [
-            ModelInfo("gpt-4o", "GPT-4o (G4F)", ProviderType.G4F, 4096),
-            ModelInfo("gpt-4", "GPT-4 (G4F)", ProviderType.G4F, 4096),
-            ModelInfo("claude-3.5-sonnet", "Claude 3.5 Sonnet (G4F)", ProviderType.G4F, 4096),
+            ModelInfo("gpt-4o", "GPT-4o (G4F)", ProviderType.G4F, 4096, is_free=True),
+            ModelInfo("gpt-4", "GPT-4 (G4F)", ProviderType.G4F, 4096, is_free=True),
+            ModelInfo("claude-3.5-sonnet", "Claude 3.5 Sonnet (G4F)", ProviderType.G4F, 4096, is_free=True),
+        ]
+
+class CerebrasProvider(OpenAIProvider):
+    """Cerebras AI提供商 (超高速)"""
+    
+    def __init__(self, api_key: str, model_name: str = "llama-3.3-70b", **kwargs):
+        # Cerebras 使用 OpenAI 兼容的 SDK
+        super().__init__(api_key, model_name, **kwargs)
+        try:
+            import openai
+            self.client = openai.OpenAI(
+                api_key=api_key,
+                base_url="https://api.cerebras.ai/v1"
+            )
+        except ImportError:
+            raise ImportError("请安装openai: pip install openai")
+            
+    def get_available_models(self) -> List[ModelInfo]:
+        return [
+            ModelInfo("gpt-oss-120b", "GPT OSS 120B (Cerebras)", ProviderType.CEREBRAS, 65536, is_free=False),
+            ModelInfo("llama-3.3-70b", "Llama 3.3 70B (Cerebras)", ProviderType.CEREBRAS, 65536, is_free=False),
+            ModelInfo("llama3.1-8b", "Llama 3.1 8B (Cerebras)", ProviderType.CEREBRAS, 8192, is_free=True),
+            ModelInfo("qwen-3-235b-a22b-instruct-2507", "Qwen 3 235B (Cerebras)", ProviderType.CEREBRAS, 65536, is_free=False),
+            ModelInfo("qwen-3-32b", "Qwen 3 32B (Cerebras)", ProviderType.CEREBRAS, 65536, is_free=False),
+            ModelInfo("zai-glm-4.6", "GLM 4.6 (Cerebras)", ProviderType.CEREBRAS, 64000, is_free=False),
         ]
 
 class LLMProviderFactory:
@@ -610,6 +662,7 @@ class LLMProviderFactory:
         ProviderType.TOGETHER: TogetherProvider,
         ProviderType.OPENROUTER: OpenRouterProvider,
         ProviderType.G4F: G4FProvider,
+        ProviderType.CEREBRAS: CerebrasProvider,
     }
     
     @classmethod
