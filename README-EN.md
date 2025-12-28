@@ -18,7 +18,7 @@ generation
 [![GitHub forks](https://img.shields.io/badge/Forks-0-blue?style=social)](https://github.com/zhouxiaoka/autoclip)
 [![GitHub issues](https://img.shields.io/badge/Issues-0-blue)](https://github.com/zhouxiaoka/autoclip/issues)
 
-**Language**: [English](README-EN.md) | [中文](README.md)
+**Language**: [English](README-EN.md) | [中文](README.md) | [Português](README-PT.md)
 
 </div>
 
@@ -34,8 +34,8 @@ interface and powerful backend processing capabilities.
 
 - 🎬 **Multi-platform Support**: One-click download from YouTube, Bilibili, and local
   file upload
-- 🤖 **AI Intelligent Analysis**: Video content understanding based on Qwen large
-  language model
+- 🤖 **AI Intelligent Analysis**: Video content understanding based on Qwen, Groq, Cerebras, and other large language models
+- 🌐 **Internationalization Support**: Automatically detect video language and intelligently generate titles and descriptions in the corresponding language (supporting English, Chinese, Portuguese, etc.)
 - ✂️ **Automatic Clipping**: Intelligent recognition of exciting clips with automatic
   cutting, supporting multiple video categories
 - 📚 **Smart Collections**: AI-recommended and manually created video collections
@@ -81,7 +81,8 @@ graph TB
 - **Redis**: Message broker and cache for task status management
 - **SQLite**: Lightweight database with PostgreSQL upgrade support
 - **yt-dlp**: YouTube video download supporting multiple formats
-- **Qwen**: AI content analysis supporting multiple models
+- **Multi-model Support**: Support for Qwen, Groq, Cerebras, Gemini, OpenAI-compatible interfaces, etc.
+- **I18n Engine**: Automatic language detection and dynamic prompt injection
 - **WebSocket**: Real-time communication and progress push
 - **Pydantic**: Data validation and serialization
 

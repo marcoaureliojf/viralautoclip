@@ -17,7 +17,7 @@
 [![GitHub forks](https://img.shields.io/badge/Forks-0-blue?style=social)](https://github.com/zhouxiaoka/autoclip)
 [![GitHub issues](https://img.shields.io/badge/Issues-0-blue)](https://github.com/zhouxiaoka/autoclip/issues)
 
-**语言**: [English](README-EN.md) | [中文](README.md)  
+**语言**: [English](README-EN.md) | [中文](README.md) | [Português](README-PT.md)  
 **联系邮箱**: [christine_zhouye@163.com](mailto:christine_zhouye@163.com)
 
 </div>
@@ -31,7 +31,8 @@ AutoClip 是一个基于 AI 的智能视频切片处理系统，能够自动从 
 ### ✨ 核心特性
 
 - 🎬 **多平台支持**: YouTube、B 站视频一键下载，支持本地文件上传
-- 🤖 **AI 智能分析**: 基于通义千问大语言模型的视频内容理解
+- 🤖 **AI 智能分析**: 基于通义千问、Groq、Cerebras 等大语言模型的视频内容理解
+- 🌐 **国际化支持**: 自动检测视频语言，智能生成对应语言的标题和说明（支持中、英、葡等）
 - ✂️ **自动切片**: 智能识别精彩片段并自动切割，支持多种视频分类
 - 📚 **智能合集**: AI 推荐和手动创建视频合集，支持拖拽排序
 - 🚀 **实时处理**: 异步任务队列，实时进度反馈，WebSocket 通信
@@ -69,7 +70,8 @@ graph TB
 - **Redis**: 消息代理和缓存，任务状态管理
 - **SQLite**: 轻量级数据库，支持升级到 PostgreSQL
 - **yt-dlp**: YouTube 视频下载，支持多种格式
-- **通义千问**: AI 内容分析，支持多种模型
+- **多模型支持**: 支持通义千问、Groq、Cerebras、Gemini、OpenAI 兼容接口等
+- **国际化引擎**: 自动语言检测与动态提示词注入
 - **WebSocket**: 实时通信，进度推送
 - **Pydantic**: 数据验证和序列化
 

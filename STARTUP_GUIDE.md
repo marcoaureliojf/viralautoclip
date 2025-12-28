@@ -85,9 +85,10 @@ DATABASE_URL=sqlite:///./data/autoclip.db
 # Redis配置
 REDIS_URL=redis://redis:6379/0
 
-# API配置
+# API配置 (可选，也可在系统界面的“设置”页配置)
 API_DASHSCOPE_API_KEY=your_api_key_here
 API_MODEL_NAME=qwen-plus
+# 推荐模型：Groq (llama3-70b/8b), Cerebras (faster), Gemini
 
 # 日志配置
 LOG_LEVEL=INFO
