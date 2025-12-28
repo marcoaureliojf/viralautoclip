@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Progress, Card, Typography, Tag, Space, Button, message } from 'antd';
 import { PlayCircleOutlined, PauseCircleOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTaskProgress, TaskProgressState } from '../hooks/useTaskProgress';
+import { useTranslation } from 'react-i18next';
 
 const { Text, Title } = Typography;
 
@@ -18,6 +19,7 @@ export const TaskProgressDisplay: React.FC<TaskProgressDisplayProps> = ({
   onTaskComplete,
   onTaskFailed
 }) => {
+  const { t, i18n } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   
   const {
@@ -33,12 +35,12 @@ export const TaskProgressDisplay: React.FC<TaskProgressDisplayProps> = ({
     },
     onTaskComplete: (state) => {
       console.log('任务完成:', state);
-      message.success('任务处理完成！');
+      message.success(t('tasks.task_complete'));
       onTaskComplete?.(state);
     },
     onTaskFailed: (state) => {
       console.log('任务失败:', state);
-      message.error(`任务处理失败: ${state.message}`);
+      message.error(`${t('tasks.task_failed_prefix')}: ${state.message}`);
       onTaskFailed?.(state);
     }
   });
@@ -56,11 +58,11 @@ export const TaskProgressDisplay: React.FC<TaskProgressDisplayProps> = ({
 
   const getPhaseText = (phase: string) => {
     switch (phase) {
-      case 'transcribe': return '语音识别';
-      case 'analyze': return '内容分析';
-      case 'clip': return '视频切片';
-      case 'encode': return '视频编码';
-      case 'upload': return '上传处理';
+      case 'transcribe': return t('tasks.phase_transcribe');
+      case 'analyze': return t('tasks.phase_analyze');
+      case 'clip': return t('tasks.phase_clip');
+      case 'encode': return t('tasks.phase_encode');
+      case 'upload': return t('tasks.phase_upload');
       default: return phase;
     }
   };
@@ -77,10 +79,10 @@ export const TaskProgressDisplay: React.FC<TaskProgressDisplayProps> = ({
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'PENDING': return '等待中';
-      case 'PROGRESS': return '进行中';
-      case 'DONE': return '已完成';
-      case 'FAIL': return '失败';
+      case 'PENDING': return t('tasks.status_pending');
+      case 'PROGRESS': return t('tasks.status_progress');
+      case 'DONE': return t('tasks.status_done');
+      case 'FAIL': return t('tasks.status_fail');
       default: return status;
     }
   };
@@ -89,12 +91,12 @@ export const TaskProgressDisplay: React.FC<TaskProgressDisplayProps> = ({
     return (
       <Card size="small" style={{ marginBottom: 16 }}>
         <Space>
-          <Text type="secondary">任务 {taskId}</Text>
+          <Text type="secondary">{t('tasks.modal_title')} {taskId}</Text>
           <Tag color={isConnected ? 'success' : 'error'}>
-            {isConnected ? '已连接' : '未连接'}
+            {isConnected ? t('tasks.connected') : t('tasks.disconnected')}
           </Tag>
           <Tag color={isSubscribed ? 'success' : 'default'}>
-            {isSubscribed ? '已订阅' : '未订阅'}
+            {isSubscribed ? t('tasks.subscribed') : t('tasks.unsubscribed')}
           </Tag>
         </Space>
       </Card>
@@ -107,7 +109,7 @@ export const TaskProgressDisplay: React.FC<TaskProgressDisplayProps> = ({
       style={{ marginBottom: 16 }}
       title={
         <Space>
-          <Text strong>任务进度</Text>
+          <Text strong>{t('tasks.column_progress')}</Text>
           <Tag color={getStatusColor(taskState.status)}>
             {getStatusText(taskState.status)}
           </Tag>
@@ -122,14 +124,14 @@ export const TaskProgressDisplay: React.FC<TaskProgressDisplayProps> = ({
             size="small" 
             icon={<ReloadOutlined />}
             onClick={performFinalStateCheck}
-            title="终态校准"
+            title={t('tasks.final_check')}
           />
           <Button 
             size="small" 
             type="text"
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            {isExpanded ? '收起' : '展开'}
+            {isExpanded ? t('tasks.collapse') : t('tasks.expand')}
           </Button>
         </Space>
       }
@@ -147,7 +149,7 @@ export const TaskProgressDisplay: React.FC<TaskProgressDisplayProps> = ({
             }}
           />
           <Text type="secondary" style={{ fontSize: '12px' }}>
-            {taskState.step}/{taskState.total} 步骤
+            {taskState.step}/{taskState.total} {t('tasks.steps_unit')}
           </Text>
         </div>
 
@@ -164,29 +166,29 @@ export const TaskProgressDisplay: React.FC<TaskProgressDisplayProps> = ({
           }}>
             <Space direction="vertical" size="small" style={{ width: '100%' }}>
               <div>
-                <Text strong>任务ID:</Text> {taskState.task_id}
+                <Text strong>{t('tasks.task_id')}:</Text> {taskState.task_id}
               </div>
               <div>
                 <Text strong>序列号:</Text> {taskState.seq}
               </div>
               <div>
-                <Text strong>时间戳:</Text> {new Date(taskState.ts * 1000).toLocaleString()}
+                <Text strong>{t('tasks.column_created')}:</Text> {new Date(taskState.ts * 1000).toLocaleString(i18n.language === 'zh' ? 'zh-CN' : i18n.language === 'pt' ? 'pt-BR' : 'en-US')}
               </div>
               <div>
-                <Text strong>最后更新:</Text> {new Date(taskState.last_updated).toLocaleString()}
+                <Text strong>{t('home.link_import')}:</Text> {new Date(taskState.last_updated).toLocaleString(i18n.language === 'zh' ? 'zh-CN' : i18n.language === 'pt' ? 'pt-BR' : 'en-US')}
               </div>
               {taskState.meta && (
                 <div>
-                  <Text strong>元数据:</Text> {JSON.stringify(taskState.meta, null, 2)}
+                  <Text strong>{t('tasks.meta')}:</Text> {JSON.stringify(taskState.meta, null, 2)}
                 </div>
               )}
               <div>
-                <Text strong>连接状态:</Text> 
+                <Text strong>{t('tasks.column_status')}:</Text> 
                 <Tag color={isConnected ? 'success' : 'error'} style={{ marginLeft: 8 }}>
-                  {isConnected ? '已连接' : '未连接'}
+                  {isConnected ? t('tasks.connected') : t('tasks.disconnected')}
                 </Tag>
                 <Tag color={isSubscribed ? 'success' : 'default'} style={{ marginLeft: 4 }}>
-                  {isSubscribed ? '已订阅' : '未订阅'}
+                  {isSubscribed ? t('tasks.subscribed') : t('tasks.unsubscribed')}
                 </Tag>
               </div>
             </Space>

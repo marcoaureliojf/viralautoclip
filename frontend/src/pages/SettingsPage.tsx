@@ -89,7 +89,7 @@ const SettingsPage: React.FC = () => {
       name: 'Cerebras',
       icon: <RobotOutlined />,
       color: '#34d399',
-      description: 'Cerebras AI (Ultra Fast)',
+      description: t('settings.providers.cerebras'),
       apiKeyField: 'cerebras_api_key',
       placeholder: t('settings.form.api_key_placeholder')
     }
@@ -139,12 +139,12 @@ const SettingsPage: React.FC = () => {
     const modelName = form.getFieldValue('model_name')
     
     if (!apiKey) {
-      message.error('请先输入API密钥')
+      message.error(t('settings.form.api_key_error'))
       return
     }
 
     if (!modelName) {
-      message.error('请先选择模型')
+      message.error(t('settings.form.model_error'))
       return
     }
 
@@ -390,6 +390,7 @@ const SettingsPage: React.FC = () => {
                     <br />• <Text strong>Groq</Text>：访问 console.groq.com 获取API密钥
                     <br />• <Text strong>OpenRouter</Text>：访问 openrouter.ai 获取API密钥
                     <br />• <Text strong>GPT4Free</Text>：无需密钥，直接使用
+                    <br />• <Text strong>Cerebras</Text>：{t('settings.instructions.cerebras_info')}
                   </Paragraph>
                 </div>
                 

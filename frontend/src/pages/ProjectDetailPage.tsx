@@ -183,13 +183,19 @@ const ProjectDetailPage: React.FC = () => {
   const handleCreateCollection = async (title: string, summary: string, clipIds: string[]) => {
     if (!id) return
     try {
-      await addCollection(id, {
-        id: `collection_${Date.now()}`,
+      const newCollection = await projectApi.createCollection(id, {
         collection_title: title,
         collection_summary: summary,
-        clip_ids: clipIds,
+        clip_ids: clipIds
+      })
+      
+      addCollection(id, {
+        id: newCollection.id,
+        collection_title: newCollection.collection_title,
+        collection_summary: newCollection.collection_summary,
+        clip_ids: newCollection.clip_ids,
         collection_type: 'manual',
-        created_at: new Date().toISOString()
+        created_at: newCollection.created_at || new Date().toISOString()
       })
       setShowCreateCollection(false)
       message.success(t('project.collection_created'))

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Input, Button, Space, message, Tooltip, Modal } from 'antd'
 import { EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
 import { projectApi } from '../services/api'
 import MagicWandIcon from './icons/MagicWandIcon'
 
@@ -21,6 +22,7 @@ const EditableCollectionTitle: React.FC<EditableCollectionTitleProps> = ({
   style,
   className
 }) => {
+  const { t } = useTranslation()
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(title)
   const [loading, setLoading] = useState(false)
@@ -61,12 +63,12 @@ const EditableCollectionTitle: React.FC<EditableCollectionTitleProps> = ({
     const trimmedValue = editValue.trim()
 
     if (!trimmedValue) {
-      message.error('标题不能为空')
+      message.error(t('edit.empty_error'))
       return
     }
 
     if (trimmedValue.length > maxLength) {
-      message.error(`标题长度不能超过${maxLength}个字符`)
+      message.error(t('edit.length_error', { max: maxLength }))
       return
     }
 
@@ -78,12 +80,12 @@ const EditableCollectionTitle: React.FC<EditableCollectionTitleProps> = ({
     setLoading(true)
     try {
       await projectApi.updateCollectionTitle(collectionId, trimmedValue)
-      message.success('标题更新成功')
+      message.success(t('edit.update_success'))
       setIsEditing(false)
       onTitleUpdate?.(trimmedValue)
     } catch (error: any) {
       console.error('更新标题失败:', error)
-      message.error(error.userMessage || error.message || '更新标题失败')
+      message.error(error.userMessage || error.message || t('edit.update_failed'))
     } finally {
       setLoading(false)
     }
@@ -94,16 +96,15 @@ const EditableCollectionTitle: React.FC<EditableCollectionTitleProps> = ({
     setGenerating(true)
     try {
       const result = await projectApi.generateCollectionTitle(collectionId)
-      console.log('生成合集标题结果:', result)
       if (result.success && result.generated_title) {
         setEditValue(result.generated_title)
-        message.success('标题生成成功，您可以继续编辑或点击保存')
+        message.success(t('edit.gen_success'))
       } else {
-        message.error('标题生成失败')
+        message.error(t('edit.gen_failed'))
       }
     } catch (error: any) {
       console.error('生成标题失败:', error)
-      message.error(error.userMessage || error.message || '生成标题失败')
+      message.error(error.userMessage || error.message || t('edit.gen_failed'))
     } finally {
       setGenerating(false)
     }
@@ -120,7 +121,7 @@ const EditableCollectionTitle: React.FC<EditableCollectionTitleProps> = ({
   if (isEditing) {
     return (
       <Modal
-        title="编辑合集标题"
+        title={t('edit.collection_title')}
         open={isEditing}
         onCancel={handleCancel}
         footer={null}
@@ -135,7 +136,7 @@ const EditableCollectionTitle: React.FC<EditableCollectionTitleProps> = ({
             onChange={(e) => setEditValue(e.target.value)}
             onKeyDown={handleKeyPress}
             maxLength={maxLength}
-            placeholder="请输入合集标题"
+            placeholder={t('edit.collection_placeholder')}
             autoSize={{ minRows: 3, maxRows: 8 }}
             style={{ 
               resize: 'none',
@@ -162,7 +163,7 @@ const EditableCollectionTitle: React.FC<EditableCollectionTitleProps> = ({
             onClick={handleCancel}
             disabled={loading || generating}
           >
-            取消
+            {t('common.cancel')}
           </Button>
           
           <Space>
@@ -172,7 +173,7 @@ const EditableCollectionTitle: React.FC<EditableCollectionTitleProps> = ({
               onClick={handleGenerateTitle}
               disabled={loading}
             >
-              AI生成标题
+              {t('edit.ai_gen_collection')}
             </Button>
             <Button
               type="primary"
@@ -181,7 +182,7 @@ const EditableCollectionTitle: React.FC<EditableCollectionTitleProps> = ({
               onClick={handleSave}
               disabled={generating}
             >
-              保存
+              {t('common.success')}
             </Button>
           </Space>
         </div>
@@ -198,7 +199,7 @@ const EditableCollectionTitle: React.FC<EditableCollectionTitleProps> = ({
       }}
       className={className}
       onClick={handleStartEdit}
-      title="点击编辑合集标题"
+      title={t('edit.click_to_edit_collection')}
     >
       <span style={{ 
         wordBreak: 'break-word',

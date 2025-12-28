@@ -1,5 +1,5 @@
-import React from 'react'
 import { Badge, Tooltip } from 'antd'
+import { useTranslation } from 'react-i18next'
 import { Project } from '../store/useProjectStore'
 import { 
   getProjectStatusConfig, 
@@ -16,6 +16,7 @@ const ProjectStatusIndicator: React.FC<ProjectStatusIndicatorProps> = ({
   project,
   size = 'default'
 }) => {
+  const { t } = useTranslation()
   // 暂时使用简单的状态处理
   const normalizedStatus = normalizeProjectStatus(project.status)
   const config = getProjectStatusConfig(normalizedStatus)
@@ -23,14 +24,14 @@ const ProjectStatusIndicator: React.FC<ProjectStatusIndicatorProps> = ({
   const getStepName = () => {
     if (normalizedStatus === 'processing' && project.current_step) {
       const stepNames = {
-        1: '内容大纲分析',
-        2: '时间轴生成',
-        3: '片段评分',
-        4: '标题生成',
-        5: '主题聚类',
-        6: '视频生成'
+        1: t('status.step1'),
+        2: t('status.step2'),
+        3: t('status.step3'),
+        4: t('status.step4'),
+        5: t('status.step5'),
+        6: t('status.step6')
       }
-      return stepNames[project.current_step as keyof typeof stepNames] || '处理中'
+      return stepNames[project.current_step as keyof typeof stepNames] || t('status.processing')
     }
     return config.text
   }

@@ -519,8 +519,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                     onCancel={(e) => {
                       e?.stopPropagation()
                     }}
-                    okText={t('common.success')}
-                    cancelText={t('common.retry')}
+                    okText={t('common.delete')}
+                    cancelText={t('common.cancel')}
                   >
                     <Button
                       type="text"
@@ -607,8 +607,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete, onRetry, o
                       onCancel={(e) => {
                         e?.stopPropagation()
                       }}
-                      okText={t('common.success')}
-                      cancelText={t('common.retry')}
+                      okText={t('common.delete')}
+                      cancelText={t('common.cancel')}
                     >
                       <Button
                         type="text"

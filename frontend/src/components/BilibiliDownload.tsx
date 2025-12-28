@@ -229,7 +229,7 @@ const BilibiliDownload: React.FC<BilibiliDownloadProps> = ({ onDownloadSuccess }
         resetForm()
          
         // 显示统一的成功提示
-        const platformName = videoType === 'bilibili' ? 'B站' : 'YouTube'
+        const platformName = videoType === 'bilibili' ? t('bili.platform_bilibili') : t('bili.platform_youtube')
         message.success(t('bili.import_hint', { platform: platformName }))
         
         if (onDownloadSuccess) {
@@ -566,7 +566,7 @@ const BilibiliDownload: React.FC<BilibiliDownloadProps> = ({ onDownloadSuccess }
               border: '1px solid rgba(255, 77, 79, 0.3)',
               borderRadius: '8px'
             }}>
-              <Text style={{ color: '#ff4d4f', fontSize: '14px' }}>错误: {currentTask.error_message}</Text>
+              <Text style={{ color: '#ff4d4f', fontSize: '14px' }}>{t('common.error')}: {currentTask.error_message}</Text>
             </div>
           )}
         </Card>

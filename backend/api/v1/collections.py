@@ -29,6 +29,13 @@ async def create_collection(
     """Create a new collection."""
     try:
         collection = collection_service.create_collection(collection_data)
+        
+        # 获取clip_ids
+        clip_ids = []
+        metadata = getattr(collection, 'collection_metadata', {}) or {}
+        if metadata and 'clip_ids' in metadata:
+            clip_ids = metadata['clip_ids']
+            
         # Convert to response schema
         status_obj = getattr(collection, 'status', None)
         status_value = status_obj.value if hasattr(status_obj, 'value') else 'created'
@@ -41,12 +48,13 @@ async def create_collection(
             theme=getattr(collection, 'theme', None),
             status=status_value,
             tags=getattr(collection, 'tags', []) or [],
-            metadata=getattr(collection, 'collection_metadata', {}) or {},
+            metadata=metadata,
             video_path=getattr(collection, 'export_path', None),
             thumbnail_path=getattr(collection, 'thumbnail_path', None),
             created_at=getattr(collection, 'created_at', None) if isinstance(getattr(collection, 'created_at', None), (type(None), __import__('datetime').datetime)) else None,
             updated_at=getattr(collection, 'updated_at', None) if isinstance(getattr(collection, 'updated_at', None), (type(None), __import__('datetime').datetime)) else None,
-            total_clips=getattr(collection, 'clips_count', 0) or 0
+            total_clips=getattr(collection, 'clips_count', 0) or 0,
+            clip_ids=clip_ids
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

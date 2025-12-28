@@ -310,8 +310,8 @@ export const projectApi = {
   },
 
   // 创建合集
-  createCollection: (projectId: string, collectionData: { collection_title: string, collection_summary: string, clip_ids: string[] }): Promise<Collection> => {
-    return api.post(`/collections/`, {
+  createCollection: async (projectId: string, collectionData: { collection_title: string, collection_summary: string, clip_ids: string[] }): Promise<Collection> => {
+    const response: any = await api.post(`/collections/`, {
       project_id: projectId,
       name: collectionData.collection_title,
       description: collectionData.collection_summary,
@@ -320,22 +320,62 @@ export const projectApi = {
         collection_type: 'manual'
       }
     })
+    
+    return {
+      id: response.id,
+      collection_title: response.name || response.collection_title || '',
+      collection_summary: response.description || response.collection_summary || '',
+      clip_ids: response.clip_ids || response.metadata?.clip_ids || [],
+      collection_type: response.metadata?.collection_type || 'manual',
+      created_at: response.created_at,
+      project_id: response.project_id
+    }
   },
 
   // 更新合集信息
-  updateCollection: (_projectId: string, collectionId: string, updates: Partial<Collection>): Promise<Collection> => {
+  updateCollection: async (_projectId: string, collectionId: string, updates: Partial<Collection>): Promise<Collection> => {
     // 如果updates包含clip_ids，需要将其包装在metadata中
-    const apiUpdates: any = { ...updates }
+    const apiUpdates: any = {}
+    if (updates.collection_title) apiUpdates.name = updates.collection_title
+    if (updates.collection_summary) apiUpdates.description = updates.collection_summary
+    
+    const metadata: any = {}
+    if (updates.collection_type) metadata.collection_type = updates.collection_type
+    
     if ('clip_ids' in updates && updates.clip_ids !== undefined) {
-      apiUpdates.metadata = { clip_ids: updates.clip_ids }
-      delete apiUpdates.clip_ids
+      metadata.clip_ids = updates.clip_ids
     }
-    return api.put(`/collections/${collectionId}`, apiUpdates)
+    
+    if (Object.keys(metadata).length > 0) {
+      apiUpdates.metadata = metadata
+    }
+    
+    const response: any = await api.put(`/collections/${collectionId}`, apiUpdates)
+    
+    return {
+      id: response.id,
+      collection_title: response.name || response.collection_title || '',
+      collection_summary: response.description || response.collection_summary || '',
+      clip_ids: response.clip_ids || response.metadata?.clip_ids || [],
+      collection_type: response.metadata?.collection_type || 'manual',
+      created_at: response.created_at,
+      project_id: response.project_id
+    }
   },
 
   // 重新排序合集切片
-  reorderCollectionClips: (projectId: string, collectionId: string, clipIds: string[]): Promise<Collection> => {
-    return api.patch(`/projects/${projectId}/collections/${collectionId}/reorder`, clipIds)
+  reorderCollectionClips: async (projectId: string, collectionId: string, clipIds: string[]): Promise<Collection> => {
+    const response: any = await api.patch(`/projects/${projectId}/collections/${collectionId}/reorder`, clipIds)
+    
+    return {
+      id: response.id || collectionId,
+      collection_title: response.name || response.collection_title || '',
+      collection_summary: response.description || response.collection_summary || '',
+      clip_ids: response.clip_ids || response.metadata?.clip_ids || clipIds,
+      collection_type: response.metadata?.collection_type || 'manual',
+      created_at: response.created_at,
+      project_id: response.project_id || projectId
+    }
   },
 
   // 删除合集

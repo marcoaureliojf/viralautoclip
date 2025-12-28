@@ -1025,9 +1025,28 @@ async def reorder_collection_clips(
         from backend.models.collection import Collection
         
         stmt = update(Collection).where(Collection.id == collection_id).values(
-            collection_metadata=metadata
+            collection_metadata=metadata,
+            clips_count=len(clip_ids)
         )
         collection_service.db.execute(stmt)
+        
+        # 同时更新关联表以保持数据库一致性
+        from backend.models.collection import clip_collection
+        # 1. 删除旧关联
+        del_stmt = clip_collection.delete().where(
+            clip_collection.c.collection_id == collection_id
+        )
+        collection_service.db.execute(del_stmt)
+        
+        # 2. 插入新关联（按指定顺序）
+        for i, clip_id in enumerate(clip_ids):
+            ins_stmt = clip_collection.insert().values(
+                clip_id=clip_id,
+                collection_id=collection_id,
+                order_index=i
+            )
+            collection_service.db.execute(ins_stmt)
+            
         collection_service.db.commit()
         
         return {
