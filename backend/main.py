@@ -62,6 +62,33 @@ async def startup_event():
     # logger.info("WebSocket网关服务已启动")
     logger.info("WebSocket网关服务已禁用，使用新的简化进度系统")
 
+    # Sincronizar projetos do sistema de arquivos na inicialização
+    # Isso permite recuperar projetos se o banco de dados for perdido/recriado
+    try:
+        from .core.database import SessionLocal
+        from .services.data_sync_service import DataSyncService
+        from .core.config import get_data_directory
+        
+        logger.info("Iniciando varredura e sincronização de projetos existentes...")
+        db = SessionLocal()
+        try:
+            data_dir = get_data_directory()
+            sync_service = DataSyncService(db)
+            # Executa a sincronização
+            result = sync_service.sync_all_projects_from_filesystem(data_dir)
+            
+            if result.get("success"):
+                logger.info(f"Sincronização concluída: {result.get('total_synced')} projetos sincronizados, {result.get('total_failed')} falhas.")
+            else:
+                logger.error(f"Erro na sincronização: {result.get('error')}")
+                
+        except Exception as e:
+            logger.error(f"Exceção durante a sincronização de projetos: {e}")
+        finally:
+            db.close()
+    except Exception as e:
+        logger.error(f"Falha crítica ao tentar sincronizar projetos: {e}")
+
 @app.on_event("shutdown")
 async def shutdown_event():
     """应用关闭事件"""

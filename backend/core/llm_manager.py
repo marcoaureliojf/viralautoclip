@@ -57,10 +57,11 @@ class LLMManager:
         """
         Realiza uma chamada direta ao provedor configurado.
         """
+        # Recarrega configurações a cada chamada para suportar troca de chaves "quente"
+        self.refresh()
+
         if not self.current_provider:
-            self._initialize_provider() # Tenta recuperar se estiver desconfigurado
-            if not self.current_provider:
-                raise ValueError("Nenhum provedor de LLM configurado. Verifique seu settings.json.")
+            raise ValueError("Nenhum provedor de LLM configurado. Verifique seu settings.json.")
         
         try:
             response = self.current_provider.call(prompt, input_data, **kwargs)

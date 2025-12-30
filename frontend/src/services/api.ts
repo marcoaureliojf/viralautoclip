@@ -128,7 +128,7 @@ export const settingsApi = {
   },
 
   // 测试API密钥
-  testApiKey: (provider: string, apiKey: string, modelName: string): Promise<{ success: boolean; error?: string }> => {
+  testApiKey: (provider: string, apiKey: string, modelName: string): Promise<{ status: string; message: string }> => {
     return api.post('/settings/test-api-key', { 
       provider, 
       api_key: apiKey, 

@@ -151,10 +151,10 @@ const SettingsPage: React.FC = () => {
     try {
       setLoading(true)
       const result = await settingsApi.testApiKey(selectedProvider, apiKey, modelName)
-      if (result.success) {
+      if (result.status === 'success') {
         message.success(t('settings.form.test_success'))
       } else {
-        message.error(t('settings.form.test_failed', { error: result.error || t('common.error') }))
+        message.error(t('settings.form.test_failed', { error: result.message || t('common.error') }))
       }
     } catch (error: any) {
       message.error(t('settings.form.test_failed', { error: error.message || t('common.error') }))

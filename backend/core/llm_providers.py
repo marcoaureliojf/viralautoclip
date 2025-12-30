@@ -557,8 +557,8 @@ class OpenRouterProvider(LLMProvider):
     def get_available_models(self) -> List[ModelInfo]:
         return [
             ModelInfo("xiaomi/mimo-v2-flash:free", "Xiaomi MiMo-V2-Flash (Free)", ProviderType.OPENROUTER, 262144, is_free=True),
-            ModelInfo("mistralai/mistral-devstral-2512:free", "Mistral Devstral 2 2512 (Free)", ProviderType.OPENROUTER, 262144, is_free=True),
-            ModelInfo("kwaipilot/kat-coder-pro-v1:free", "Kwaipilot KAT-Coder-Pro V1 (Free)", ProviderType.OPENROUTER, 256000, is_free=True),
+            ModelInfo("mistralai/devstral-2512:free", "Mistral Devstral 2 2512 (Free)", ProviderType.OPENROUTER, 262144, is_free=True),
+            ModelInfo("kwaipilot/kat-coder-pro:free", "Kwaipilot KAT-Coder-Pro V1 (Free)", ProviderType.OPENROUTER, 256000, is_free=True),
             ModelInfo("tngtech/deepseek-r1t2-chimera:free", "TNG DeepSeek R1T2 Chimera (Free)", ProviderType.OPENROUTER, 164000, is_free=True),
             ModelInfo("nex-agi/deepseek-v3.1-nex-n1:free", "Nex AGI DeepSeek V3.1 Nex N1 (Free)", ProviderType.OPENROUTER, 131000, is_free=True),
             ModelInfo("nvidia/nemotron-3-nano-30b-a3b:free", "NVIDIA Nemotron 3 Nano 30B A3B (Free)", ProviderType.OPENROUTER, 256000, is_free=True),

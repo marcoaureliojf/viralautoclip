@@ -77,9 +77,21 @@ class ClusteringEngine:
             validated_collections = self._validate_collections(collections_data, clips_with_titles)
             
             # 如果LLM聚类结果不理想，使用预聚类结果
-            if len(validated_collections) < 3:
-                logger.warning("LLM聚类结果不理想，使用预聚类结果")
-                validated_collections = self._create_collections_from_pre_clusters(pre_clusters, clips_with_titles)
+            # 如果LLM聚类结果为空或较少
+            if len(validated_collections) < 2:
+                logger.warning("LLM聚类结果不足，尝试使用其他方案")
+                
+                # 尝试预聚类结果
+                if pre_clusters:
+                    pre_generated = self._create_collections_from_pre_clusters(pre_clusters, clips_with_titles)
+                    if len(pre_generated) > len(validated_collections):
+                        logger.info("使用预聚类结果")
+                        validated_collections = pre_generated
+            
+            # 如果最终没有任何合集（LLMfail 且 预聚类fail），强制使用默认按分数聚合
+            if not validated_collections:
+                logger.warning("无有效合集生成，使用默认按分数聚合规则")
+                validated_collections = self._create_default_collections(clips_with_titles)
             
             logger.info(f"主题聚类完成，共{len(validated_collections)}个合集")
             return validated_collections
